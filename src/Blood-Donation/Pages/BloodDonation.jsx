@@ -1,30 +1,53 @@
 import React from "react";
 import Header from "../Components/Header";
-import { Clock, CheckCircle, AlertCircle, HelpCircle, BellRing, MapPin } from "lucide-react";
+import {
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  HelpCircle,
+  BellRing,
+  MapPin,
+  DropletIcon,
+} from "lucide-react";
 import InfoCards from "../Components/InfoCards";
 
 function BloodDonation() {
   const donationSteps = [
     {
       number: 1,
-      title: 'Inscription',
-      description: 'Connectez-vous, présentez une pièce d\'identité et remplissez un questionnaire de santé confidentiel.'
+      title: "Inscription",
+      description:
+        "Connectez-vous, présentez une pièce d'identité et remplissez un questionnaire de santé confidentiel.",
     },
     {
       number: 2,
-      title: 'Mini-Examen Médical',
-      description: 'Vérification rapide de la température, de la tension artérielle, du pouls et des niveaux d\'hémoglobine.'
+      title: "Mini-Examen Médical",
+      description:
+        "Vérification rapide de la température, de la tension artérielle, du pouls et des niveaux d'hémoglobine.",
     },
     {
       number: 3,
-      title: 'Don de Sang',
-      description: 'Le don proprement dit prend environ 10 minutes. Vous serez confortablement installé pendant le prélèvement d\'une pinte de sang.'
+      title: "Don de Sang",
+      description:
+        "Le don proprement dit prend environ 10 minutes. Vous serez confortablement installé pendant le prélèvement d'une pinte de sang.",
     },
     {
       number: 4,
-      title: 'Collation',
-      description: 'Profitez de collations et de boissons dans l\'espace de repos. Reposez-vous 10-15 minutes avant de partir.'
-    }
+      title: "Collation",
+      description:
+        "Profitez de collations et de boissons dans l'espace de repos. Reposez-vous 10-15 minutes avant de partir.",
+    },
+  ];
+  const leftColumnItems = [
+    "Inspirer les gens à donner du sang",
+    "Donneurs de sang spécialisés et supervision clinique",
+    "Produire un approvisionnement en sang sûr et prêt",
+  ];
+
+  const rightColumnItems = [
+    "Augmenter la communication avec nos membres",
+    "Évaluation, diagnostic et traitement de haute qualité",
+    "Offrir des services spécialisés aux patients",
   ];
 
   return (
@@ -129,7 +152,9 @@ function BloodDonation() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Le Processus de Don</h2>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Le Processus de Don
+            </h2>
             <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
               Ce à quoi vous pouvez vous attendre lors d'un don de sang
             </p>
@@ -137,18 +162,22 @@ function BloodDonation() {
 
           <div className="relative">
             {donationSteps.map((step, index) => (
-              <div key={step.number} className="flex items-center mb-6 relative">
-
+              <div
+                key={step.number}
+                className="flex items-center mb-6 relative"
+              >
                 {index < donationSteps.length - 1 && (
                   <div className="absolute left-[30px] top-[30px] bottom-0 w-1 bg-red-500 z-0"></div>
                 )}
-                
+
                 <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-2xl z-10 relative">
                   {step.number}
                 </div>
-                
+
                 <div className="ml-6 pl-4 z-10">
-                  <h3 className="text-xl font-semibold text-red-500">{step.title}</h3>
+                  <h3 className="text-xl font-semibold text-red-500">
+                    {step.title}
+                  </h3>
                   <p className="text-gray-700">{step.description}</p>
                 </div>
               </div>
@@ -257,15 +286,16 @@ function BloodDonation() {
 
       <InfoCards />
 
-        {/* Who We Are Section */}
-        <section className="py-16 bg-gray-50">
+      {/* Who We Are Section */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">
               Qui Sommes-Nous ?
             </h2>
             <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-              Une plateforme qui connecte les donneurs de sang avec ceux qui en ont besoin
+              Une plateforme qui connecte les donneurs de sang avec ceux qui en
+              ont besoin
             </p>
           </div>
 
@@ -285,7 +315,7 @@ function BloodDonation() {
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
                 Notre Service de Demandes de Don de Sang
               </h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start">
                   <BellRing className="h-8 w-8 text-red-500 mr-4 mt-1" />
@@ -294,8 +324,9 @@ function BloodDonation() {
                       Notifications en Temps Réel
                     </h4>
                     <p className="text-gray-600">
-                      Lorsqu'un besoin urgent de sang est signalé, tous les utilisateurs
-                      potentiellement compatibles reçoivent immédiatement une notification.
+                      Lorsqu'un besoin urgent de sang est signalé, tous les
+                      utilisateurs potentiellement compatibles reçoivent
+                      immédiatement une notification.
                     </p>
                   </div>
                 </div>
@@ -307,9 +338,9 @@ function BloodDonation() {
                       Localisation Précise
                     </h4>
                     <p className="text-gray-600">
-                      Notre plateforme permet de localiser rapidement les donneurs
-                      de sang ayant le bon groupe sanguin et se trouvant à proximité
-                      du lieu de besoin.
+                      Notre plateforme permet de localiser rapidement les
+                      donneurs de sang ayant le bon groupe sanguin et se
+                      trouvant à proximité du lieu de besoin.
                     </p>
                   </div>
                 </div>
@@ -321,8 +352,9 @@ function BloodDonation() {
                       Processus Simple
                     </h4>
                     <p className="text-gray-600">
-                      Publiez une demande, et notre système identifie et contacte
-                      les donneurs potentiels correspondant aux critères recherchés.
+                      Publiez une demande, et notre système identifie et
+                      contacte les donneurs potentiels correspondant aux
+                      critères recherchés.
                     </p>
                   </div>
                 </div>
@@ -337,6 +369,94 @@ function BloodDonation() {
           </div>
         </div>
       </section>
+
+      {/* ways to help Section */}
+
+      <section className="bg-blue-800 text-white py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 gap-4 ">
+          <div className="text-left mb-12">
+            <h2 className="text-4xl font-bold mb-4">Moyens d'Aider</h2>
+            <p className="text-xl">Rejoignez-nous pour sauver des vies !</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 grid-1fr">
+            <div className="space-y-6">
+              {leftColumnItems.map((item, index) => (
+                <div key={index} className="flex items-center space-x-4">
+                  <DropletIcon className="h-6 w-6 text-white" />
+                  <span className="text-lg">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-6">
+              {rightColumnItems.map((item, index) => (
+                <div key={index} className="flex items-center space-x-4">
+                  <DropletIcon className="h-6 w-6 text-white" />
+                  <span className="text-lg">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+<section className="py-16 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl font-bold text-gray-900">Questions fréquemment posées</h2>
+      <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+        Questions courantes sur le don de sang
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">À quelle fréquence puis-je donner mon sang ?</h3>
+        <p className="text-gray-700">
+          Vous pouvez donner du sang entier tous les 56 jours (8 semaines). Si vous donnez des plaquettes, vous pouvez donner tous les 7 jours, jusqu'à 24 fois par an.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Est-ce que ça fait mal de donner son sang ?</h3>
+        <p className="text-gray-700">
+          La plupart des gens ressentent juste une légère piqûre lorsque l'aiguille est insérée. Le processus de don lui-même est relativement indolore.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Combien de temps dure le processus de don ?</h3>
+        <p className="text-gray-700">
+          Le processus complet prend environ 30 à 45 minutes, avec le prélèvement de sang qui dure environ 10 minutes.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Que dois-je faire avant de donner mon sang ?</h3>
+        <p className="text-gray-700">
+          Mangez un repas équilibré, buvez beaucoup de liquides et dormez suffisamment avant de donner votre sang. Évitez les aliments gras avant le don.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Que devient mon sang après le don ?</h3>
+        <p className="text-gray-700">
+          Votre sang est testé, traité et séparé en composants (globules rouges, plasma, plaquettes) qui peuvent aider plusieurs patients.
+        </p>
+      </div>
+
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Puis-je donner mon sang si je prends des médicaments ?</h3>
+        <p className="text-gray-700">
+          De nombreux médicaments sont acceptables. Apportez une liste de vos médicaments au centre de don, et le personnel déterminera votre éligibilité.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
     </>
   );
 }

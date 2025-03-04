@@ -10,6 +10,7 @@ import {
   DropletIcon,
 } from "lucide-react";
 import InfoCards from "../Components/InfoCards";
+import Footer from "../Components/Footer";
 
 function BloodDonation() {
   const donationSteps = [
@@ -456,7 +457,7 @@ function BloodDonation() {
     </div>
   </div>
 </section>
-
+<Footer />
     </>
   );
 }

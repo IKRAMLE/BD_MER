@@ -7,10 +7,10 @@ const ServiceCards = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 gap-8">
+    <div className="flex flex-col md:flex-row justify-center items-center min-h-screen bg-gray-100 gap-6 p-6">
       {/* Blood Donation Card */}
       <motion.div
-        className="p-6 rounded-2xl shadow-2xl drop-shadow-lg bg-red-50 w-80 h-67 text-center"
+        className="p-6 rounded-2xl shadow-2xl drop-shadow-lg bg-red-50 w-full sm:w-80 text-center"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -34,7 +34,7 @@ const ServiceCards = () => {
 
       {/* Medical Equipment Rental Card */}
       <motion.div
-        className="p-6 rounded-2xl shadow-2xl drop-shadow-lg bg-blue-50 w-80 h-67 text-center"
+        className="p-6 rounded-2xl shadow-2xl drop-shadow-lg bg-blue-50 w-full sm:w-80 text-center"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}

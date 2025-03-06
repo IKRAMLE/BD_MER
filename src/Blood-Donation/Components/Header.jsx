@@ -6,6 +6,7 @@ import {
   FaMoon,
   FaSun,
   FaBars,
+  FaGlobe,
   FaTimes,
 } from "react-icons/fa";
 import logo from "/logo2.png";
@@ -19,8 +20,11 @@ const Header = () => {
   const [urgentDropdownOpen, setUrgentDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    localStorage.getItem("language") || "EN"
+  );
 
-  // UseRef to handle dropdown timeout properly
   const dropdownTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +36,13 @@ const Header = () => {
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);
+
+  const handleLanguageChange = (lang) => {
+    setSelectedLanguage(lang);
+    localStorage.setItem("language", lang);
+    setLanguageDropdownOpen(false);
+    console.log("Language changed to:", lang);
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +65,9 @@ const Header = () => {
 
       {/* Navigation Links */}
       <ul
-        className={`absolute md:static top-16 left-0 w-full md:w-auto bg-white dark:bg-gray-900 md:flex space-x-6 text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${menuOpen ? "block" : "hidden"} md:flex-row md:items-center md:space-x-6 -mr-30 md:ml-10 px-6 md:px-0`}
+        className={`absolute md:static top-16 left-0 w-full md:w-auto bg-white dark:bg-gray-900 md:flex space-x-6 text-gray-800 dark:text-gray-200 font-medium transition-all duration-300 ${
+          menuOpen ? "block" : "hidden"
+        } md:flex-row md:items-center md:space-x-6 px-6 md:px-0`}
       >
         <li>
           <Link to="/home" className="block py-2 md:py-0 hover:text-red-500">Accueil</Link>
@@ -94,7 +107,13 @@ const Header = () => {
       <div className="hidden md:flex items-center space-x-4">
         {/* Search Bar */}
         <form onSubmit={handleSearchSubmit} className="flex items-center border border-gray-300 dark:border-gray-600 rounded-full px-3 py-1 shadow-sm">
-          <input type="text" className="bg-transparent outline-none px-2 py-1 text-gray-800 dark:text-gray-200" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+          <input
+            type="text"
+            className="bg-transparent outline-none px-2 py-1 text-gray-800 dark:text-gray-200"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <button type="submit" className="text-gray-600 dark:text-gray-300">
             <FaSearch />
           </button>
@@ -109,6 +128,31 @@ const Header = () => {
             <div className="absolute mt-2 w-50 bg-white dark:bg-gray-800 border dark:border-gray-600 shadow-lg rounded-md p-4 text-center text-gray-600 dark:text-gray-300">
               Aucune demande urgente
             </div>
+          )}
+        </div>
+
+        {/* Language Selector */}
+        <div className="relative">
+          <button
+            onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+            className="focus:outline-none"
+          >
+            <FaGlobe className="text-gray-600 dark:text-gray-300 text-lg mt-1" />
+          </button>
+
+          {languageDropdownOpen && (
+            <ul className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 border dark:border-gray-600 shadow-lg rounded-md text-gray-800 dark:text-gray-200">
+              {["AR", "FR", "EN"].map((lang) => (
+                <li key={lang}>
+                  <button
+                    onClick={() => handleLanguageChange(lang)}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  >
+                    {lang}
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 

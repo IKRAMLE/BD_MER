@@ -95,200 +95,8 @@ function BloodDonation() {
         </div>
       </section>
 
-      {/* Why Donate Section */}
-      <section className="py-16 bg-white -mt-15">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Pourquoi donner du sang ?
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-              Votre don fait une réelle différence dans la vie des gens
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-red-50 p-6 rounded-lg text-center">
-              <div className="flex justify-center mb-4">
-                <CheckCircle className="h-12 w-12 text-red-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Sauver des vies</h3>
-              <p className="text-gray-600 text-justify">
-                Un don peut sauver jusqu'à trois vies. Le sang est essentiel
-                pour les opérations chirurgicales, les traitements contre le
-                cancer, les maladies chroniques et les blessures traumatiques.
-              </p>
-            </div>
-
-            <div className="bg-red-50 p-6 rounded-lg text-center">
-              <div className="flex justify-center mb-4">
-                <Clock className="h-12 w-12 text-red-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Processus rapide</h3>
-              <p className="text-gray-600 text-justify">
-                Le processus de don ne prend qu'environ 30 à 45 minutes du début
-                à la fin, la prise de sang proprement dite prenant environ 10
-                minutes.
-              </p>
-            </div>
-
-            <div className="bg-red-50 p-6 rounded-lg text-center">
-              <div className="flex justify-center mb-4">
-                <HelpCircle className="h-12 w-12 text-red-500" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Bienfaits pour la santé
-              </h3>
-              <p className="text-gray-600 text-justify">
-                Un don de sang régulier peut réduire le risque de crise
-                cardiaque et de cancer. Il aide également à réduire les niveaux
-                de fer dans le corps.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Donation Process Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Le Processus de Don
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-              Ce à quoi vous pouvez vous attendre lors d'un don de sang
-            </p>
-          </div>
-
-          <div className="relative">
-            {donationSteps.map((step, index) => (
-              <div
-                key={step.number}
-                className="flex items-center mb-6 relative"
-              >
-                {index < donationSteps.length - 1 && (
-                  <div className="absolute left-[30px] top-[30px] bottom-0 w-1 bg-red-500 z-0"></div>
-                )}
-
-                <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-2xl z-10 relative">
-                  {step.number}
-                </div>
-
-                <div className="ml-6 pl-4 z-10">
-                  <h3 className="text-xl font-semibold text-red-500">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-700">{step.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Eligibility Section */}
-
-      <section className="py-16 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Conditions d'éligibilité
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-              Vérifiez si vous êtes éligible pour donner votre sang
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="p-8">
-                <h3 className="text-2xl font-semibold mb-6 text-red-600">
-                  Exigences de base
-                </h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Avoir au moins 17 ans (16 ans avec consentement parental
-                      dans certains États)
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Peser au moins 50 kg</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Être en bonne santé générale et se sentir bien</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Ne pas avoir donné de sang total au cours des 56 derniers
-                      jours
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div className="p-8 bg-red-50">
-                <h3 className="text-2xl font-semibold mb-6 text-red-600">
-                  Délais d'attente temporaires
-                </h3>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Rhume, grippe ou fièvre : Attendez la disparition des
-                      symptômes
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Grossesse : Attendez 6 semaines après l'accouchement
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Tatouages : Attendez entre 3 et 12 mois selon la
-                      réglementation de votre pays
-                    </span>
-                  </li>
-                  <li className="flex items-start">
-                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>
-                      Voyage dans une zone à risque de paludisme : Attendez 3
-                      mois après votre retour
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Support Section */}
-      <section className="bg-gray-50 py-12 text-center -mt-12">
-        <h5 className="text-blue-600 font-semibold uppercase text-sm">
-          Impliquez-vous
-        </h5>
-        <h2 className="text-4xl font-bold text-gray-900 mt-2">
-          Votre soutien est inestimable
-        </h2>
-        <div className="w-12 h-1 bg-red-500 mx-auto my-3"></div>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Il existe de nombreuses façons de contribuer à notre mission de sauver
-          des vies grâce au don de sang.
-        </p>
-      </section>
-
-      <InfoCards />
-
-      {/* Who We Are Section */}
-      <section className="py-16 bg-gray-50">
+       {/* Who We Are Section */}
+       <section className="py-16 bg-gray-50 -mt-15">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -371,16 +179,191 @@ function BloodDonation() {
         </div>
       </section>
 
-      {/* ways to help Section */}
+      {/* Why Donate Section */}
+      <section className="py-16 bg-white -mt-15">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Pourquoi donner du sang ?
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+              Votre don fait une réelle différence dans la vie des gens
+            </p>
+          </div>
 
-      <section className="bg-blue-800 text-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 gap-4 ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-red-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <CheckCircle className="h-12 w-12 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Sauver des vies</h3>
+              <p className="text-gray-600 text-justify">
+                Un don peut sauver jusqu'à trois vies. Le sang est essentiel
+                pour les opérations chirurgicales, les traitements contre le
+                cancer, les maladies chroniques et les blessures traumatiques.
+              </p>
+            </div>
+
+            <div className="bg-red-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <Clock className="h-12 w-12 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Processus rapide</h3>
+              <p className="text-gray-600 text-justify">
+                Le processus de don ne prend qu'environ 30 à 45 minutes du début
+                à la fin, la prise de sang proprement dite prenant environ 10
+                minutes.
+              </p>
+            </div>
+
+            <div className="bg-red-50 p-6 rounded-lg text-center">
+              <div className="flex justify-center mb-4">
+                <HelpCircle className="h-12 w-12 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                Bienfaits pour la santé
+              </h3>
+              <p className="text-gray-600 text-justify">
+                Un don de sang régulier peut réduire le risque de crise
+                cardiaque et de cancer. Il aide également à réduire les niveaux
+                de fer dans le corps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+       {/* Eligibility Section */}
+
+       <section className="py-16 bg-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Conditions d'éligibilité
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+              Vérifiez si vous êtes éligible pour donner votre sang
+            </p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="p-8">
+                <h3 className="text-2xl font-semibold mb-6 text-red-600">
+                  Exigences de base
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Avoir au moins 17 ans (16 ans avec consentement parental
+                      dans certains États)
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>Peser au moins 50 kg</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>Être en bonne santé générale et se sentir bien</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-6 w-6 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Ne pas avoir donné de sang total au cours des 56 derniers
+                      jours
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-8 bg-red-50">
+                <h3 className="text-2xl font-semibold mb-6 text-red-600">
+                  Délais d'attente temporaires
+                </h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Rhume, grippe ou fièvre : Attendez la disparition des
+                      symptômes
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Grossesse : Attendez 6 semaines après l'accouchement
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Tatouages : Attendez entre 3 et 12 mois selon la
+                      réglementation de votre pays
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <AlertCircle className="h-6 w-6 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span>
+                      Voyage dans une zone à risque de paludisme : Attendez 3
+                      mois après votre retour
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Donation Process Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Le Processus de Don
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+              Ce à quoi vous pouvez vous attendre lors d'un don de sang
+            </p>
+          </div>
+
+          <div className="relative">
+            {donationSteps.map((step, index) => (
+              <div
+                key={step.number}
+                className="flex items-center mb-6 relative"
+              >
+                {index < donationSteps.length - 1 && (
+                  <div className="absolute left-[30px] top-[30px] bottom-0 w-1 bg-red-500 z-0"></div>
+                )}
+
+                <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-2xl z-10 relative">
+                  {step.number}
+                </div>
+
+                <div className="ml-6 pl-4 z-10">
+                  <h3 className="text-xl font-semibold text-red-500">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-700">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+       {/* ways to help Section */}
+
+       <section className="bg-blue-800 text-white py-6 -mt-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 gap-4  ">
           <div className="text-left mb-12">
             <h2 className="text-4xl font-bold mb-4">Moyens d'Aider</h2>
             <p className="text-xl">Rejoignez-nous pour sauver des vies !</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 grid-1fr">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 grid-1fr ">
             <div className="space-y-6">
               {leftColumnItems.map((item, index) => (
                 <div key={index} className="flex items-center space-x-4">
@@ -401,6 +384,27 @@ function BloodDonation() {
           </div>
         </div>
       </section>
+
+      {/* Support Section */}
+      <section className="bg-gray-50 py-12 text-center ">
+        <h5 className="text-blue-600 font-semibold uppercase text-sm">
+          Impliquez-vous
+        </h5>
+        <h2 className="text-4xl font-bold text-gray-900 mt-2">
+          Votre soutien est inestimable
+        </h2>
+        <div className="w-12 h-1 bg-red-500 mx-auto my-3"></div>
+        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          Il existe de nombreuses façons de contribuer à notre mission de sauver
+          des vies grâce au don de sang.
+        </p>
+      </section>
+
+      <InfoCards />
+
+     
+
+    
 
       {/* FAQ Section */}
 <section className="py-16 bg-white">

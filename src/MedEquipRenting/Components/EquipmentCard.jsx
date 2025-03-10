@@ -20,7 +20,7 @@ const EquipmentCard = ({
   return (
     <div className="relative group">
       <div className="glass-card rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
-        {/* Image container */}
+        {/* Conteneur d'image */}
         <div className="relative aspect-[4/3] overflow-hidden">
           {isLoading && (
             <div className="absolute inset-0 shimmer-effect"></div>
@@ -47,20 +47,20 @@ const EquipmentCard = ({
           
           {isNew && (
             <div className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-green-500 text-white rounded-full">
-              New
+              Nouveau
             </div>
           )}
           
           {isFeatured && (
             <div className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-amber-500 text-white rounded-full">
-              Featured
+              Vedette
             </div>
           )}
           
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-20 pointer-events-none"></div>
         </div>
         
-        {/* Content */}
+        {/* Contenu */}
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
@@ -71,7 +71,7 @@ const EquipmentCard = ({
             </div>
             <div className="text-right">
               <p className="text-lg font-bold text-[#0058a6]">{price.toLocaleString('fr-MA')} DH</p>
-              <p className="text-xs text-[#b8b2ab]">per {timeUnit}</p>
+              <p className="text-xs text-[#b8b2ab]">par {timeUnit}</p>
             </div>
           </div>
           
@@ -85,10 +85,10 @@ const EquipmentCard = ({
                 <Star size={14} fill="currentColor" /> 
               </div>
               <span className="text-sm font-medium text-gray-800">{rating}</span>
-              <span className="text-xs text-[#b8b2ab] ml-1">({reviewCount} reviews)</span>
+              <span className="text-xs text-[#b8b2ab] ml-1">({reviewCount} avis)</span>
             </div>
             <button className="text-sm font-medium text-[#0070cc] hover:text-[#0058a6]">
-              View details
+              Voir les détails
             </button>
           </div>
         </div>

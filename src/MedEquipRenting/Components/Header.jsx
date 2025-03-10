@@ -22,7 +22,7 @@ const Navbar = () => {
 
   return (
     <div className="relative">
-      <nav className="fixed w-full bg-blue-600 text-white py-4 px-6 shadow-lg z-50">
+      <nav className="fixed w-full bg-white text-blue-600 py-4 px-6 shadow-lg z-50">
         <div className="container mx-auto flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold">MediShare</Link>
 

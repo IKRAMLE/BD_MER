@@ -3,104 +3,104 @@ import EquipmentCard from './EquipmentCard';
 import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 const equipmentCategories = [
-  "All",
-  "Mobility",
-  "Respiratory",
-  "Home Care",
-  "Monitoring",
-  "Daily Living",
-  "Pediatric",
+  "Tous", 
+  "Mobilité",
+  "Respiratoire",
+  "Soins à domicile",
+  "Surveillance", 
+  "Vie quotidienne", 
+  "Pédiatrique", 
 ];
 
 const featuredEquipment = [
   {
     id: 1,
-    name: "Wheelchair - Foldable Premium",
+    name: "Fauteuil roulant - Premium pliable",
     image: "/wheelchair.png",
     price: 300,
-    timeUnit: "week",
+    timeUnit: "semaine", 
     location: "Casablanca",
-    category: "Mobility",
+    category: "Mobilité", 
     rating: 4.9,
     reviewCount: 23,
     isNew: true,
   },
   {
     id: 2,
-    name: "Oxygen Concentrator - 5L",
+    name: "Concentrateur d'oxygène - 5L",
     image: "/wheelchair.png",
     price: 450,
-    timeUnit: "week",
+    timeUnit: "semaine",  
     location: "Rabat",
-    category: "Respiratory",
+    category: "Respiratoire", 
     rating: 4.7,
     reviewCount: 18,
     isFeatured: true,
   },
   {
     id: 3,
-    name: "Hospital Bed - Electric Adjustable",
+    name: "Lit d'hôpital - Électrique réglable", 
     image: "/wheelchair.png",
     price: 800,
-    timeUnit: "month",
+    timeUnit: "mois", 
     location: "Marrakech",
-    category: "Home Care",
+    category: "Soins à domicile", 
     rating: 4.8,
     reviewCount: 15,
   },
   {
     id: 4,
-    name: "Blood Pressure Monitor - Digital",
+    name: "Moniteur de pression artérielle - Numérique", 
     image: "/wheelchair.png",
     price: 120,
-    timeUnit: "week",
-    location: "Tangier",
-    category: "Monitoring",
+    timeUnit: "semaine", 
+    location: "Tanger",
+    category: "Surveillance", 
     rating: 4.5,
     reviewCount: 32,
   },
   {
     id: 5,
-    name: "Pediatric Nebulizer Kit",
+    name: "Kit Nébuliseur pédiatrique", 
     image: "/wheelchair.png",
     price: 200,
-    timeUnit: "week",
+    timeUnit: "semaine", 
     location: "Agadir",
-    category: "Pediatric",
+    category: "Pédiatrique", 
     rating: 4.6,
     reviewCount: 14,
     isNew: true,
   },
   {
     id: 6,
-    name: "Walker with Seat - Adjustable",
+    name: "Déambulateur avec siège - Réglable", 
     image: "/wheelchair.png",
     price: 150,
-    timeUnit: "week",
-    location: "Fes",
-    category: "Mobility",
+    timeUnit: "semaine", 
+    location: "Fès",
+    category: "Mobilité", 
     rating: 4.7,
     reviewCount: 21,
   },
   {
     id: 7,
-    name: "Shower Chair - Non-slip",
+    name: "Chaise de douche - Antidérapante", 
     image: "/wheelchair.png",
     price: 100,
-    timeUnit: "week",
+    timeUnit: "semaine", 
     location: "Casablanca",
-    category: "Daily Living",
+    category: "Vie quotidienne", 
     rating: 4.4,
     reviewCount: 19,
   },
   {
     id: 8,
-    name: "CPAP Machine with Humidifier",
+    name: "Machine CPAP avec humidificateur", 
     image: "/wheelchair.png",
     price: 500,
-    timeUnit: "week",
+    timeUnit: "semaine", 
     location: "Rabat",
-    category: "Respiratory",
+    category: "Respiratoire",
     rating: 4.9,
     reviewCount: 27,
     isFeatured: true,
@@ -108,14 +108,14 @@ const featuredEquipment = [
 ];
 
 const Items = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [filteredItems, setFilteredItems] = useState(featuredEquipment);
   const [visibleItems, setVisibleItems] = useState(4);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    if (selectedCategory === "All") {
+    if (selectedCategory === "Tous") { 
       setFilteredItems(featuredEquipment);
     } else {
       setFilteredItems(
@@ -167,10 +167,10 @@ const Items = () => {
     <section id="browse" ref={sectionRef} className="py-20">
       <div className="container-custom">
         <div className="text-center">
-          <h2 className="section-heading">Browse Available Equipment</h2>
+          <h2 className="section-heading">Explorer l'équipement disponible</h2> 
           <p className="section-subheading">
-            Discover a wide range of high-quality medical equipment available for rent
-            across Morocco, all thoroughly sanitized and well-maintained.
+            Découvrez une large gamme d'équipements médicaux de haute qualité disponibles à la location 
+            à travers le Maroc, tous soigneusement désinfectés et bien entretenus.
           </p>
         </div>
 
@@ -213,11 +213,11 @@ const Items = () => {
         {/* Filter and sort controls */}
         <div className="flex justify-between items-center mb-6 px-1">
           <p className="text-sm text-[#958a80]">
-            Showing <span className="font-medium">{Math.min(visibleItems, filteredItems.length)}</span> of <span className="font-medium">{filteredItems.length}</span> items
+            Affichage de <span className="font-medium">{Math.min(visibleItems, filteredItems.length)}</span> sur <span className="font-medium">{filteredItems.length}</span> articles {/* Showing X of Y items */}
           </p>
           
           <button className="flex items-center text-sm font-medium text-gray-700 hover:text-[#0070cc]">
-            <Filter size={16} className="mr-1" /> Filter & Sort
+            <Filter size={16} className="mr-1" /> Filtrer & Trier 
           </button>
         </div>
 
@@ -241,12 +241,12 @@ const Items = () => {
               className="button-secondary"
               onClick={handleViewMore}
             >
-              {visibleItems === 4 ? 'View More' : 'View Less'}
+              {visibleItems === 4 ? 'Voir plus' : 'Voir moins'} 
             </button>
           </div>
         ) : (
           <div className="mt-10 text-center">
-            <p className="text-[#a39991]">No items found in this category.</p>
+            <p className="text-[#a39991]">Aucun article trouvé dans cette catégorie.</p> 
           </div>
         )}
       </div>

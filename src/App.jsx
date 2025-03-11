@@ -6,6 +6,7 @@ import MedicalEquipment from "./MedEquipRenting/Pages/MedicalEquipment";
 import Login from "./Blood-Donation/Pages/Login";
 import SignUpPage from './Blood-Donation/Pages/Signup';
 import Login2 from './MedEquipRenting/Pages/Login';
+import SignUpPage2 from './MedEquipRenting/Pages/Signup';
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         {/* Route for Medical Equipment Renting and its login */}
         <Route path="/medical-equipment" element={<MedicalEquipment />} />
         <Route path="/login2" element={<Login2 />} />
+        <Route path="/signup2" element={<SignUpPage2 />} />
       </Routes>
     </Router>
   );

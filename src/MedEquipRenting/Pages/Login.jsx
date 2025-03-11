@@ -38,7 +38,7 @@ const Login = () => {
                 Bienvenue
               </h1>
               <p className="mt-2 text-[#0070cc]">
-                Connectez-vous à votre compte MediShare Maroc
+                Connectez-vous à votre compte MediShare 
               </p>
             </div>
             {error && (
@@ -104,6 +104,24 @@ const Login = () => {
                       <Eye className="h-5 w-5 text-[#37aaf8]" />
                     )}
                   </button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-[#0070cc] focus:ring-[#108de4] border-[#7cc7fc] rounded"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-[#0058a6]">
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-sm">
+                  <Link to="/forgot-password" className="font-medium text-[#0070cc] hover:text-[#108de4] ">
+                    Forgot your password?
+                  </Link>
                 </div>
               </div>
               <button

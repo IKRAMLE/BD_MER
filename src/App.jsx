@@ -7,6 +7,7 @@ import Login from "./Blood-Donation/Pages/Login";
 import SignUpPage from './Blood-Donation/Pages/Signup';
 import Login2 from './MedEquipRenting/Pages/Login';
 import SignUpPage2 from './MedEquipRenting/Pages/Signup';
+import ForgotPassword from "./MedEquipRenting/Pages/Forgotpassword";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/medical-equipment" element={<MedicalEquipment />} />
         <Route path="/login2" element={<Login2 />} />
         <Route path="/signup2" element={<SignUpPage2 />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </Router>
   );

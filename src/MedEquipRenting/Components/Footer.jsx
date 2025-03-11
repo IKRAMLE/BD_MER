@@ -9,11 +9,8 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-6">
-              <div className="h-12 w-12 rounded-md bg-white flex items-center justify-center mr-3">
-                <span className="text-[#084b88] font-bold text-2xl">M</span>
-              </div>
               <span className="font-semibold text-2xl text-white">
-                MediShare<span className="text-[#7cc7fc]">Maroc</span>
+                Medi<span className="text-[#7cc7fc]">Share</span>
               </span>
             </div>
 
@@ -174,7 +171,7 @@ const Footer = () => {
 
         <div className="border-t border-[#084b88] mt-12 pt-8 text-center">
           <p className="text-[#7cc7fc] text-sm">
-            © {new Date().getFullYear()} MediShare Maroc. Tous droits réservés.
+            © {new Date().getFullYear()} MediShare. Tous droits réservés.
           </p>
           <p className="flex items-center justify-center text-xs text-[#37aaf8] mt-2">
             Créé avec <Heart size={12} className="mx-1 text-rose-500" /> pour la

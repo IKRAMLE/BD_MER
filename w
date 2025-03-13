@@ -740,3 +740,111 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// tableau
+
+ {/* Equipment List Section */}
+ <div className="bg-white rounded-xl shadow-sm p-6">
+ <h2 className="text-xl font-semibold text-[#084b88] mb-4">Your Equipment</h2>
+ 
+ <div className="overflow-x-auto">
+   <table className="w-full">
+     <thead>
+       <tr className="text-left border-b border-[#e0f0fe]">
+         <th className="pb-3 text-sm font-medium text-[#108de4]">Name</th>
+         <th className="pb-3 text-sm font-medium text-[#108de4]">Status</th>
+         <th className="pb-3 text-sm font-medium text-[#108de4]">Price</th>
+         <th className="pb-3 text-sm font-medium text-[#108de4]">Actions</th>
+       </tr>
+     </thead>
+     <tbody>
+       {equipment.map((item) => (
+         <tr key={item.id} className="border-b border-[#e0f0fe]">
+           <td className="py-4 text-[#084b88]">{item.name}</td>
+           <td className="py-4">
+             <span className={`px-3 py-1 rounded-full text-xs ${
+               item.status === 'active' 
+                 ? 'bg-green-100 text-green-600' 
+                 : 'bg-[#f1efee] text-[#958a80]'
+             }`}>
+               {item.status}
+             </span>
+           </td>
+           <td className="py-4 text-[#084b88]">{item.price} DH</td>
+           <td className="py-4">
+             <button className="text-[#0070cc] hover:text-[#108de4] mr-3">
+               <Settings size={16} />
+             </button>
+             <button className="text-red-400 hover:text-red-500">
+               <LogOut size={16} />
+             </button>
+           </td>
+         </tr>
+       ))}
+     </tbody>
+   </table>
+ </div>
+</div>
+
+
+//chart
+
+
+
+ {/* Stats Overview */}
+ <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+ <div className="bg-white rounded-xl shadow-sm p-6 flex items-center">
+   <div className="rounded-full p-3 bg-[#e0f0fe] text-[#0070cc] mr-4">
+     <Package size={24} />
+   </div>
+   <div>
+     <p className="text-sm text-[#108de4]">Total Equipment</p>
+     <p className="text-2xl font-semibold text-[#084b88]">{stats.totalEquipment}</p>
+   </div>
+ </div>
+ 
+ <div className="bg-white rounded-xl shadow-sm p-6 flex items-center">
+   <div className="rounded-full p-3 bg-green-100 text-green-600 mr-4">
+     <TrendingUp size={24} />
+   </div>
+   <div>
+     <p className="text-sm text-[#108de4]">Active Listings</p>
+     <p className="text-2xl font-semibold text-[#084b88]">{stats.active}</p>
+   </div>
+ </div>
+ 
+ <div className="bg-white rounded-xl shadow-sm p-6 flex items-center">
+   <div className="rounded-full p-3 bg-[#f1efee] text-[#958a80] mr-4">
+     <Bookmark size={24} />
+   </div>
+   <div>
+     <p className="text-sm text-[#108de4]">Pending Requests</p>
+     <p className="text-2xl font-semibold text-[#084b88]">{stats.pending}</p>
+   </div>
+ </div>
+ 
+ <div className="bg-white rounded-xl shadow-sm p-6 flex items-center">
+   <div className="rounded-full p-3 bg-[#bae0fd] text-[#0070cc] mr-4">
+     <PieChart size={24} />
+   </div>
+   <div>
+     <p className="text-sm text-[#108de4]">Total Revenue</p>
+     <p className="text-2xl font-semibold text-[#084b88]">{stats.revenue} DH</p>
+   </div>
+ </div>
+</div>

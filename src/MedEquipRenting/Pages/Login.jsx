@@ -20,7 +20,7 @@ const Login = () => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Example: Successful login simulation
-      navigate("/dashboard"); // Redirect to the dashboard or another page
+      navigate("/dashboard"); 
     } catch (err) {
       setError("La connexion a échoué. Veuillez réessayer.");
     } finally {

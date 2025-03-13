@@ -8,6 +8,7 @@ import FAQ from '../Components/FAQ'
 import ContactUs from '../Components/Contact'
 import Footer from '../Components/Footer'
 
+
 function MedicalEquipment() {
   return (
     <>

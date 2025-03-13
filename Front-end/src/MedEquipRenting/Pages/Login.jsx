@@ -16,13 +16,38 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call (replace with actual API logic)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Make an actual API call to your backend to verify credentials
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-      // Example: Successful login simulation
-      navigate("/dashboard"); 
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If the server responds with an error
+        throw new Error(data.message || "La connexion a échoué");
+      }
+
+      if (data.success) {
+        // Store user data or token in localStorage or a state management solution
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Navigate to dashboard on successful login
+        navigate("/dashboard");
+      } else {
+        // This handles the case where the API returns success: false
+        throw new Error(data.message || "Informations d'identification non valides");
+      }
     } catch (err) {
-      setError("La connexion a échoué. Veuillez réessayer.");
+      setError(err.message || "La connexion a échoué. Veuillez réessayer.");
     } finally {
       setIsLoading(false);
     }

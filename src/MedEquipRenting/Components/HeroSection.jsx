@@ -10,14 +10,14 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="pt-28 pb-20 md:pt-40 md:pb-32 relative overflow-hidden">
+    <section className="pt-28 pb-22 md:pt-40 md:pb-32 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-0 left-0 right-0 h-full">
         <div className="absolute top-1/4 right-1/3 w-64 h-64 rounded-full bg-[#e0f0fe] blur-3xl opacity-50"></div>
         <div className="absolute bottom-1/3 left-1/4 w-80 h-80 rounded-full bg-[#bae0fd] blur-3xl opacity-60"></div>
       </div>
 
-      <div className="container-custom relative z-10 -mt-17">
+      <div className="container-custom relative z-10 -mt-6">
         <div className="max-w-4xl mx-auto text-center">
           <span
             className={`inline-block px-4 py-1.5 mb-6 text-sm font-medium rounded-full bg-[#f0f7ff] text-[#108de4] border border-[#e0f0fe] transition-all duration-700 ${

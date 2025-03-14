@@ -78,7 +78,7 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link to="/rent-equipment" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+            <Link to="/rent-equip" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Louer un équipement
             </Link>
             <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
@@ -126,7 +126,7 @@ const Navbar = () => {
               <Link to="/" className="py-2 hover:text-blue-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Accueil
               </Link>
-              <Link to="/rent-equipment" className="py-2 hover:text-blue-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/rent-equip" className="py-2 hover:text-blue-100 transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Louer un équipement
               </Link>
               <Link to="/contact" className="py-2 hover:text-blue-100 transition-colors" onClick={() => setIsMenuOpen(false)}>

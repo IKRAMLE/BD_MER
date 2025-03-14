@@ -125,7 +125,7 @@ const Dashboard = () => {
       condition: item.condition || '',
       availability: item.availability || 'available',
       location: item.location || '',
-      image: null, // We don't pre-fill the image
+      image: null, 
     });
     setShowEditForm(true);
     setShowAddForm(false);
@@ -409,12 +409,12 @@ const Dashboard = () => {
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   {filteredEquipment.map((item) => (
     <div key={item._id} className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="h-48 bg-gray-200 relative">
+      <div className="h-50 bg-gray-200 relative">
         {item.image ? (
           <img 
-            src={`${API_URL}${item.image}`} 
+            src={`http://localhost:5000${item.image}`} 
             alt={item.name} 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
           <div className="flex items-center justify-center h-full bg-[#f0f7ff]">

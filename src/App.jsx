@@ -34,6 +34,10 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/rent-equip" element={<RentEquip />} /> 
         <Route path="/profile" element={<Profile />} />
+
+           {/* Protected routes */}
+           <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
+          <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
       </Routes>
     </Router>
   );

@@ -10,6 +10,7 @@ import SignUpPage2 from './MedEquipRenting/Pages/Signup';
 import ForgotPassword from "./MedEquipRenting/Pages/Forgotpassword";
 import Dashboard from "./MedEquipRenting/Pages/Dashboard";
 import RentEquip from "./MedEquipRenting/Pages/RentEquip";
+import Profile from "./MedEquipRenting/Pages/Profile"
 
 
 
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/rent-equip" element={<RentEquip />} /> 
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

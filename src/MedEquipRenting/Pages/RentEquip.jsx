@@ -71,7 +71,7 @@ function RentEquip() {
       <div className="flex flex-col md:flex-row">
         <FiltringSidebar onFilterChange={handleFilterChange} />
         
-        <main className="flex-1 p-5 mt-23">
+        <main className="flex-1 p-5 mt-23 ml-3">
           <h1 className="text-2xl font-bold mb-6">Rent Medical Equipment</h1>
           
           {loading ? (
@@ -96,7 +96,7 @@ function RentEquip() {
                         <img 
                           src={`http://localhost:5000${item.image}`} 
                           alt={item.name} 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-200">

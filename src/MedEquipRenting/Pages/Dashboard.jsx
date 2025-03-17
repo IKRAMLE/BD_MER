@@ -389,6 +389,13 @@ if (authChecked && !isLoggedIn) {
                 <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
               </button>
             </div>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white cursor-pointer -mt-1" style={{ backgroundColor: "#0058a6", boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)" }}>
+              {userData?.photoURL ? (
+                <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <span className="text-base font-bold">{userData?.email?.charAt(0)?.toUpperCase() || "U"}</span>
+              )}
+            </div>
           </div>
         </header>
         

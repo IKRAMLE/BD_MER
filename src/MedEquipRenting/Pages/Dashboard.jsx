@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import logo from "/caduceus.png";
 
-
 const API_URL = 'http://localhost:5000/api';
 
 const Dashboard = () => {
@@ -26,6 +25,8 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -44,6 +45,20 @@ const Dashboard = () => {
     location: '',
     image: null,
   });
+
+  useEffect(() => {
+    // Check if user is logged in
+    const user = localStorage.getItem('user');
+    if (user) {
+      setIsLoggedIn(true);
+      setUserData(JSON.parse(user));
+      setActiveMenuItem(location.pathname);
+      fetchData();
+    } else {
+      // Redirect to login if not logged in
+      navigate('/login2');
+    }
+  }, [location, navigate]);
 
   // Fetch equipment and stats from API
   const fetchData = async () => {
@@ -66,11 +81,6 @@ const Dashboard = () => {
     }
   };
 
-  useEffect(() => {
-    setActiveMenuItem(location.pathname);
-    fetchData();
-  }, [location]);
-
   const menuItems = [
     { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
     { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
@@ -88,7 +98,8 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/profile');
+    setIsLoggedIn(false);
+    navigate('/login2');
   };
 
   const handleImageChange = (e) => {
@@ -245,6 +256,10 @@ const Dashboard = () => {
     item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (!isLoggedIn) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <div className="flex h-screen">

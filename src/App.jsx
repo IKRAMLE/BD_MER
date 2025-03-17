@@ -11,6 +11,7 @@ import ForgotPassword from "./MedEquipRenting/Pages/Forgotpassword";
 import Dashboard from "./MedEquipRenting/Pages/Dashboard";
 import RentEquip from "./MedEquipRenting/Pages/RentEquip";
 import Profile from "./MedEquipRenting/Pages/Profile"
+import AuthGuard from "./MedEquipRenting/Components/AuthGuard";
 
 
 

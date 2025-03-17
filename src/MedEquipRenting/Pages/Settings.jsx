@@ -36,7 +36,7 @@ const Settings = () => {
       // Redirect to login if not logged in
       navigate('/login2');
       // Toast message would be here
-      alert("Authentication required. Please log in to access settings");
+      alert("Authentification requise. Veuillez vous connecter pour accéder aux paramètres");
     }
   }, [navigate]);
 
@@ -44,7 +44,7 @@ const Settings = () => {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     // Toast message would be here
-    alert("You have been successfully logged out");
+    alert("Vous avez été déconnecté avec succès");
     navigate('/login2');
   };
 
@@ -84,7 +84,7 @@ const Settings = () => {
       setUserData(updatedUser);
       
       // Toast message would be here
-      alert("Your settings have been successfully updated");
+      alert("Vos paramètres ont été mis à jour avec succès");
     }
   };
 
@@ -93,7 +93,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col mt-10">
       <Header/>
       
       <div className="flex-grow py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#f0f7ff]">
@@ -106,7 +106,7 @@ const Settings = () => {
                   <User size={40} />
                 </div>
                 <h2 className="text-xl font-bold text-[#084b88]">{userData.email}</h2>
-                <p className="text-[#0070cc]">Member since {new Date().toLocaleDateString()}</p>
+                <p className="text-[#0070cc]">Membre depuis {new Date().toLocaleDateString()}</p>
               </div>
               
               <div className="space-y-2">
@@ -115,75 +115,75 @@ const Settings = () => {
                   className="flex items-center p-3 rounded-lg text-[#0070cc] hover:bg-[#f0f7ff] transition-colors"
                 >
                   <User className="h-5 w-5 mr-3" />
-                  Profile
+                  Profil
                 </Link>
                 <Link 
                   to="/dashboard" 
                   className="flex items-center p-3 rounded-lg text-[#0070cc] hover:bg-[#f0f7ff] transition-colors"
                 >
                   <Package className="h-5 w-5 mr-3" />
-                  My Products
+                  Mes Produits
                 </Link>
                 <Link 
                   to="/settings" 
                   className="flex items-center p-3 rounded-lg text-[#0070cc] bg-[#f0f7ff] hover:bg-[#e0f0fe] transition-colors"
                 >
                   <SettingsIcon className="h-5 w-5 mr-3" />
-                  Settings
+                  Paramètres
                 </Link>
                 <button 
                   onClick={handleLogout}
                   className="flex w-full items-center p-3 rounded-lg text-red-700 hover:bg-red-50 transition-colors"
                 >
                   <LogOut className="h-5 w-5 mr-3" />
-                  Logout
+                  Déconnexion
                 </button>
               </div>
             </div>
             
             {/* Main Content */}
             <div className="md:col-span-3 bg-white rounded-2xl shadow-lg p-6">
-              <h1 className="text-2xl font-bold text-[#084b88] mb-6">Account Settings</h1>
+              <h1 className="text-2xl font-bold text-[#084b88] mb-6">Paramètres du Compte</h1>
               
               <form onSubmit={handleSubmit}>
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Profile Information</h2>
+                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Informations du Profil</h2>
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
+                          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nom Complet</label>
                           <input 
                             id="name" 
                             name="name" 
                             value={formData.name} 
                             onChange={handleInputChange}
-                            placeholder="Your full name"
+                            placeholder="Votre nom complet"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#108de4] focus:ring focus:ring-[#108de4] focus:ring-opacity-50"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Adresse Email</label>
                           <input 
                             id="email" 
                             name="email" 
                             type="email" 
                             value={formData.email} 
                             onChange={handleInputChange}
-                            placeholder="Your email address"
+                            placeholder="Votre adresse email"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#108de4] focus:ring focus:ring-[#108de4] focus:ring-opacity-50"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Numéro de Téléphone</label>
                           <input 
                             id="phone" 
                             name="phone" 
                             value={formData.phone} 
                             onChange={handleInputChange}
-                            placeholder="Your phone number"
+                            placeholder="Votre numéro de téléphone"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#108de4] focus:ring focus:ring-[#108de4] focus:ring-opacity-50"
                           />
                         </div>
@@ -194,12 +194,12 @@ const Settings = () => {
                   <hr className="border-t border-gray-200" />
                   
                   <div>
-                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Notification Preferences</h2>
+                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Préférences de Notification</h2>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-[#084b88] font-medium">New Rental Requests</h3>
-                          <p className="text-[#108de4] text-sm">Receive notifications when someone requests your equipment</p>
+                          <h3 className="text-[#084b88] font-medium">Nouvelles Demandes de Location</h3>
+                          <p className="text-[#108de4] text-sm">Recevoir des notifications lorsque quelqu'un demande votre équipement</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
@@ -213,8 +213,8 @@ const Settings = () => {
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-[#084b88] font-medium">New Messages</h3>
-                          <p className="text-[#108de4] text-sm">Get notified when you receive new messages</p>
+                          <h3 className="text-[#084b88] font-medium">Nouveaux Messages</h3>
+                          <p className="text-[#108de4] text-sm">Être notifié lorsque vous recevez de nouveaux messages</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
@@ -228,8 +228,8 @@ const Settings = () => {
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-[#084b88] font-medium">Platform Updates</h3>
-                          <p className="text-[#108de4] text-sm">Stay informed about new features and updates</p>
+                          <h3 className="text-[#084b88] font-medium">Mises à Jour de la Plateforme</h3>
+                          <p className="text-[#108de4] text-sm">Restez informé des nouvelles fonctionnalités et mises à jour</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
@@ -247,12 +247,12 @@ const Settings = () => {
                   <hr className="border-t border-gray-200" />
                   
                   <div>
-                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Appearance</h2>
+                    <h2 className="text-xl font-semibold text-[#0070cc] mb-4">Apparence</h2>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-[#084b88] font-medium">Dark Mode</h3>
-                          <p className="text-[#108de4] text-sm">Switch to dark theme</p>
+                          <h3 className="text-[#084b88] font-medium">Mode Sombre</h3>
+                          <p className="text-[#108de4] text-sm">Passer au thème sombre</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
@@ -273,7 +273,7 @@ const Settings = () => {
                       className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0070cc] hover:bg-[#0058a6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#108de4]"
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      Save Changes
+                      Sauvegarder les Modifications
                     </button>
                   </div>
                 </div>

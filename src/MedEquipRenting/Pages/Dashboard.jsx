@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios'; 
 import { 
   Bell, Search, ChevronLeft, ChevronRight, 
   Compass, TrendingUp, User, Heart, Plus, LogOut,
-  Package, Settings, Edit, Trash2, X,
+  Package, Settings, Edit, Trash2, X, AlertCircle
 } from 'lucide-react';
 import logo from "/caduceus.png";
+
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -27,6 +28,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -54,11 +56,9 @@ const Dashboard = () => {
       setUserData(JSON.parse(user));
       setActiveMenuItem(location.pathname);
       fetchData();
-    } else {
-      // Redirect to login if not logged in
-      navigate('/login2');
     }
-  }, [location, navigate]);
+    setAuthChecked(true);
+  }, [location]);
 
   // Fetch equipment and stats from API
   const fetchData = async () => {
@@ -257,10 +257,53 @@ const Dashboard = () => {
     item.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!isLoggedIn) {
-    return null; // Will redirect via useEffect
-  }
+// Show authentication required message
+if (authChecked && !isLoggedIn) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-red-500 text-white p-8 rounded-t-2xl">
+          <div className="flex items-center">
+            <AlertCircle size={32} className="mr-4" />
+            <h2 className="text-2xl font-bold">Authentification requise</h2>
+          </div>
+          <p className="mt-2 text-white/90">
+            Veuillez vous connecter pour accéder à cette page.
+          </p>
+        </div>
+        <div className="p-8 bg-white">
+          <p className="text-gray-600 mb-6">
+            Vous devez être connecté(e) pour voir et gérer votre équipement médical. Veuillez vous connecter pour continuer.
+          </p>
+          <div className="flex flex-col space-y-4">
+            <Link 
+              to="/login2" 
+              className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
+            >
+              <User size={18} className="mr-2" />
+              Se connecter
+            </Link>
+            <Link
+              to="/"
+              className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
+            >
+              Retour à l'accueil
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff]">
+        <div className="text-[#0070cc] text-xl">Loading...</div>
+      </div>
+    );
+  }
   return (
     <div className="flex h-screen">
       {/* Sidebar */}

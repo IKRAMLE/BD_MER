@@ -31,7 +31,7 @@ const Profile = () => {
   if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff]">
-        <div className="text-[#0070cc] text-xl">Loading...</div>
+        <div className="text-[#0070cc] text-xl">Chargement...</div>
       </div>
     );
   }
@@ -76,6 +76,14 @@ const Profile = () => {
     );
   }
 
+  // Format the createdAt date from user data
+  const formatMemberDate = () => {
+    if (userData && userData.createdAt) {
+      return new Date(userData.createdAt).toLocaleDateString();
+    }
+    return new Date().toLocaleDateString();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -93,7 +101,7 @@ const Profile = () => {
                   {userData.email}
                 </h2>
                 <p className="text-[#0070cc]">
-                  Member since {new Date().toLocaleDateString()}
+                  Membre depuis {formatMemberDate()}
                 </p>
               </div>
 
@@ -103,28 +111,28 @@ const Profile = () => {
                   className="flex items-center p-3 rounded-lg text-[#0058a6] bg-[#f0f7ff] hover:bg-[#e0f0fe] transition-colors"
                 >
                   <User className="h-5 w-5 mr-3" />
-                  Profile
+                  Profil
                 </Link>
                 <Link
                   to="/my-equipment"
                   className="flex items-center p-3 rounded-lg text-[#0058a6] hover:bg-[#f0f7ff] transition-colors"
                 >
                   <Package className="h-5 w-5 mr-3" />
-                  My Equipment
+                  Mon Équipement
                 </Link>
                 <Link
                   to="/settings"
                   className="flex items-center p-3 rounded-lg text-[#0058a6] hover:bg-[#f0f7ff] transition-colors"
                 >
                   <Settings className="h-5 w-5 mr-3" />
-                  Settings
+                  Paramètres
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex w-full items-center p-3 rounded-lg text-red-700 hover:bg-red-50 transition-colors"
                 >
                   <LogOut className="h-5 w-5 mr-3" />
-                  Logout
+                  Déconnexion
                 </button>
               </div>
             </div>
@@ -132,51 +140,51 @@ const Profile = () => {
             {/* Main Content */}
             <div className="md:col-span-3 bg-white rounded-2xl shadow-lg p-6">
               <h1 className="text-2xl font-bold text-[#084b88] mb-6">
-                Welcome back!
+                Bienvenue !
               </h1>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-[#108de4] to-[#0070cc] rounded-xl p-6 text-white shadow-md">
-                  <h3 className="text-lg font-medium mb-1">Quick Access</h3>
+                  <h3 className="text-lg font-medium mb-1">Accès Rapide</h3>
                   <p className="text-[#e0f0fe] mb-4">
-                    Manage your medical equipment
+                    Gérez votre équipement médical
                   </p>
                   <Link
                     to="/dashboard"
                     className="inline-block px-4 py-2 bg-white text-[#0070cc] rounded-lg hover:bg-[#f0f7ff] transition-colors"
                   >
-                    Go to My Dashboard
+                    Accéder à Mon Tableau de Bord
                   </Link>
                 </div>
 
                 <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-md">
                   <h3 className="text-lg font-medium mb-1">
-                    Add New Equipment
+                    Ajouter Nouvel Équipement
                   </h3>
                   <p className="text-green-100 mb-4">
-                    Share your medical equipment
+                    Partagez votre équipement médical
                   </p>
                   <Link
                     to="/add-equipment"
                     className="inline-block px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors"
                   >
-                    Add Equipment
+                    Ajouter Équipement
                   </Link>
                 </div>
               </div>
 
               <div className="bg-[#f0f7ff] rounded-xl p-6 mb-6">
                 <h3 className="text-xl font-semibold text-[#084b88] mb-4">
-                  Recent Activity
+                  Activité Récente
                 </h3>
                 <p className="text-[#0070cc]">
-                  You haven't had any recent activity yet.
+                  Vous n'avez pas encore eu d'activité récente.
                 </p>
               </div>
 
               <div className="border border-[#e0f0fe] rounded-xl p-6">
                 <h3 className="text-xl font-semibold text-[#084b88] mb-4">
-                  Account Information
+                  Informations du Compte
                 </h3>
                 <div className="space-y-4">
                   <div>
@@ -184,11 +192,11 @@ const Profile = () => {
                     <p className="text-[#084b88]">{userData.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#108de4]">Member Status</p>
-                    <p className="text-[#084b88]">Active</p>
+                    <p className="text-sm text-[#108de4]">Statut du Membre</p>
+                    <p className="text-[#084b88]">Actif</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#108de4]">Last Login</p>
+                    <p className="text-sm text-[#108de4]">Dernière Connexion</p>
                     <p className="text-[#084b88]">
                       {new Date().toLocaleString()}
                     </p>

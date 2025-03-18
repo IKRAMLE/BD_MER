@@ -1,15 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import axios from 'axios'; 
-import { 
-  Bell, Search, ChevronLeft, ChevronRight, 
-  Compass, TrendingUp, User, Heart, Plus, LogOut,
-  Package, Settings, Edit, Trash2, X, AlertCircle
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import axios from "axios";
+import {
+  Bell,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Compass,
+  TrendingUp,
+  User,
+  Heart,
+  Plus,
+  LogOut,
+  Package,
+  Settings,
+  Edit,
+  Trash2,
+  X,
+  AlertCircle,
+} from "lucide-react";
 import logo from "/caduceus.png";
 
-
-const API_URL = 'http://localhost:5000/api';
+const API_URL = "http://localhost:5000/api";
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -22,7 +34,7 @@ const Dashboard = () => {
     totalEquipment: 0,
     active: 0,
     pending: 0,
-    revenue: 0
+    revenue: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,22 +47,22 @@ const Dashboard = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [equipmentToDelete, setEquipmentToDelete] = useState(null);
   const [currentEquipment, setCurrentEquipment] = useState(null);
-  const [formMode, setFormMode] = useState('add');
+  const [formMode, setFormMode] = useState("add");
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    price: '',
-    rentalPeriod: 'day',
-    condition: '',
-    availability: 'available',
-    location: '',
+    name: "",
+    description: "",
+    category: "",
+    price: "",
+    rentalPeriod: "day",
+    condition: "",
+    availability: "available",
+    location: "",
     image: null,
   });
 
   useEffect(() => {
     // Check if user is logged in
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     if (user) {
       setIsLoggedIn(true);
       setUserData(JSON.parse(user));
@@ -67,15 +79,17 @@ const Dashboard = () => {
       // Fetch equipment
       const equipmentRes = await axios.get(`${API_URL}/equipment`);
       setEquipment(equipmentRes.data);
-      
+
       // Fetch stats
       const statsRes = await axios.get(`${API_URL}/stats`);
       setStats(statsRes.data);
-      
+
       setError(null);
     } catch (err) {
-      console.error('Error fetching data:', err);
-      setError('Échec du chargement des données. Veuillez réessayer plus tard.');
+      console.error("Error fetching data:", err);
+      setError(
+        "Échec du chargement des données. Veuillez réessayer plus tard."
+      );
     } finally {
       setLoading(false);
     }
@@ -97,9 +111,9 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
-    navigate('/login2');
+    navigate("/login2");
   };
 
   const handleImageChange = (e) => {
@@ -108,16 +122,16 @@ const Dashboard = () => {
   };
 
   const handleAddEquipment = () => {
-    setFormMode('add');
+    setFormMode("add");
     setFormData({
-      name: '',
-      description: '',
-      category: '',
-      price: '',
-      rentalPeriod: 'day',
-      condition: '',
-      availability: 'available',
-      location: '',
+      name: "",
+      description: "",
+      category: "",
+      price: "",
+      rentalPeriod: "day",
+      condition: "",
+      availability: "available",
+      location: "",
       image: null,
     });
     setShowAddForm(true);
@@ -125,18 +139,18 @@ const Dashboard = () => {
   };
 
   const handleEditEquipment = (item) => {
-    setFormMode('edit');
+    setFormMode("edit");
     setCurrentEquipment(item);
     setFormData({
-      name: item.name || '',
-      description: item.description || '',
-      category: item.category || '',
-      price: item.price || '',
-      rentalPeriod: item.rentalPeriod || 'day',
-      condition: item.condition || '',
-      availability: item.availability || 'available',
-      location: item.location || '',
-      image: null, 
+      name: item.name || "",
+      description: item.description || "",
+      category: item.category || "",
+      price: item.price || "",
+      rentalPeriod: item.rentalPeriod || "day",
+      condition: item.condition || "",
+      availability: item.availability || "available",
+      location: item.location || "",
+      image: null,
     });
     setShowEditForm(true);
     setShowAddForm(false);
@@ -149,23 +163,25 @@ const Dashboard = () => {
 
   const confirmDelete = async () => {
     if (!equipmentToDelete) return;
-    
+
     setLoading(true);
     try {
       await axios.delete(`${API_URL}/equipment/${equipmentToDelete._id}`);
-      
+
       // Remove deleted item from state
-      setEquipment(prev => prev.filter(item => item._id !== equipmentToDelete._id));
-      
+      setEquipment((prev) =>
+        prev.filter((item) => item._id !== equipmentToDelete._id)
+      );
+
       // Close modal
       setIsDeleteModalOpen(false);
       setEquipmentToDelete(null);
-      
+
       // Refresh data to update stats
       fetchData();
     } catch (err) {
-      console.error('Error deleting equipment:', err);
-      setError('Échec de la suppression de l\'équipement. Veuillez réessayer.');
+      console.error("Error deleting equipment:", err);
+      setError("Échec de la suppression de l'équipement. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -184,118 +200,129 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       // Create FormData object for file upload
       const formDataObj = new FormData();
-      
+
       // Append all form fields to FormData
-      Object.keys(formData).forEach(key => {
-        if (key === 'image' && formData[key]) {
-          formDataObj.append('image', formData[key]);
+      Object.keys(formData).forEach((key) => {
+        if (key === "image" && formData[key]) {
+          formDataObj.append("image", formData[key]);
         } else if (formData[key] !== null && formData[key] !== undefined) {
           formDataObj.append(key, formData[key]);
         }
       });
-      
+
       let response;
-      
-      if (formMode === 'add') {
+
+      if (formMode === "add") {
         // Send POST request to add equipment
         response = await axios.post(`${API_URL}/equipment`, formDataObj, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            "Content-Type": "multipart/form-data",
+          },
         });
-        
+
         // Add new equipment to state
-        setEquipment(prev => [response.data, ...prev]);
-      } else if (formMode === 'edit' && currentEquipment) {
+        setEquipment((prev) => [response.data, ...prev]);
+      } else if (formMode === "edit" && currentEquipment) {
         // Send PUT request to update equipment
-        response = await axios.put(`${API_URL}/equipment/${currentEquipment._id}`, formDataObj, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        response = await axios.put(
+          `${API_URL}/equipment/${currentEquipment._id}`,
+          formDataObj,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
-        });
-        
+        );
+
         // Update equipment in state
-        setEquipment(prev => 
-          prev.map(item => item._id === currentEquipment._id ? response.data : item)
+        setEquipment((prev) =>
+          prev.map((item) =>
+            item._id === currentEquipment._id ? response.data : item
+          )
         );
       }
-      
+
       // Reset form and close form view
       setFormData({
-        name: '',
-        description: '',
-        category: '',
-        price: '',
-        rentalPeriod: 'day',
-        condition: '',
-        availability: 'available',
-        location: '',
+        name: "",
+        description: "",
+        category: "",
+        price: "",
+        rentalPeriod: "day",
+        condition: "",
+        availability: "available",
+        location: "",
         image: null,
       });
       setShowAddForm(false);
       setShowEditForm(false);
       setCurrentEquipment(null);
-      
+
       // Refresh data to update stats
       fetchData();
     } catch (err) {
-      console.error('Error saving equipment:', err);
-      setError(`Échec de ${formMode === 'add' ? 'l\'ajout' : 'la mise à jour'} de l\'équipement. Veuillez réessayer.`);
+      console.error("Error saving equipment:", err);
+      setError(
+        `Échec de ${
+          formMode === "add" ? "l'ajout" : "la mise à jour"
+        } de l\'équipement. Veuillez réessayer.`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   // Filter equipment based on search query
-  const filteredEquipment = equipment.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredEquipment = equipment.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-// Show authentication required message
-if (authChecked && !isLoggedIn) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-red-500 text-white p-8 rounded-t-2xl">
-          <div className="flex items-center">
-            <AlertCircle size={32} className="mr-4" />
-            <h2 className="text-2xl font-bold">Authentification requise</h2>
+  // Show authentication required message
+  if (authChecked && !isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-red-500 text-white p-8 rounded-t-2xl">
+            <div className="flex items-center">
+              <AlertCircle size={32} className="mr-4" />
+              <h2 className="text-2xl font-bold">Authentification requise</h2>
+            </div>
+            <p className="mt-2 text-white/90">
+              Veuillez vous connecter pour accéder à cette page.
+            </p>
           </div>
-          <p className="mt-2 text-white/90">
-            Veuillez vous connecter pour accéder à cette page.
-          </p>
-        </div>
-        <div className="p-8 bg-white">
-          <p className="text-gray-600 mb-6">
-            Vous devez être connecté(e) pour voir et gérer votre équipement médical. Veuillez vous connecter pour continuer.
-          </p>
-          <div className="flex flex-col space-y-4">
-            <Link 
-              to="/login2" 
-              className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
-            >
-              <User size={18} className="mr-2" />
-              Se connecter
-            </Link>
-            <Link
-              to="/"
-              className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
-            >
-              Retour à l'accueil
-            </Link>
+          <div className="p-8 bg-white">
+            <p className="text-gray-600 mb-6">
+              Vous devez être connecté(e) pour voir et gérer votre équipement
+              médical. Veuillez vous connecter pour continuer.
+            </p>
+            <div className="flex flex-col space-y-4">
+              <Link
+                to="/login2"
+                className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
+              >
+                <User size={18} className="mr-2" />
+                Se connecter
+              </Link>
+              <Link
+                to="/"
+                className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
+              >
+                Retour à l'accueil
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   if (!authChecked) {
     return (
@@ -307,48 +334,53 @@ if (authChecked && !isLoggedIn) {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div 
+      <div
         className={`bg-gradient-to-b from-[#084b88] to-[#082a4d] text-white transition-all duration-300 ${
           isSidebarOpen ? "w-64" : "w-20"
         } fixed h-full z-40 shadow-xl`}
       >
         <div className="flex items-center justify-between p-4">
-          <div className={`flex items-center ${!isSidebarOpen && 'justify-center w-full'}`}>
+          <div
+            className={`flex items-center ${
+              !isSidebarOpen && "justify-center w-full"
+            }`}
+          >
             <div className="h-10 w-10 rounded-3xl bg-gradient-to-br from-[#37aaf8] to-[#0070cc] flex items-center justify-center mr-2 shadow-md">
               <img src={logo} alt="MediShare" className="h-7" />
             </div>
             {isSidebarOpen && (
-              <span className="font-semibold text-xl">
-                MediShare
-              </span>
+              <span className="font-semibold text-xl">MediShare</span>
             )}
           </div>
         </div>
-        
+
         <nav className="mt-8 px-4">
           <div className="space-y-2">
             {menuItems.map((item) => (
               <div
                 key={item.text}
                 className={`flex items-center py-3 px-4 rounded-xl cursor-pointer transition-all duration-200 ${
-                  activeMenuItem === item.path 
-                    ? "bg-[#0058a6] text-white" 
+                  activeMenuItem === item.path
+                    ? "bg-[#0058a6] text-white"
                     : "text-[#e0f0fe] hover:bg-[#0058a6]/50"
                 }`}
                 onClick={() => handleMenuClick(item.path)}
               >
-                <item.icon size={20} className={isSidebarOpen ? "mr-3" : "mx-auto"} />
+                <item.icon
+                  size={20}
+                  className={isSidebarOpen ? "mr-3" : "mx-auto"}
+                />
                 {isSidebarOpen && <span>{item.text}</span>}
               </div>
             ))}
           </div>
         </nav>
-        
+
         <div className="absolute bottom-0 w-full p-4 border-t border-[#0058a6]">
-          <button 
-            onClick={handleLogout} 
+          <button
+            onClick={handleLogout}
             className={`flex items-center text-red-300 hover:text-red-100 hover:bg-red-900/20 py-3 px-4 rounded-xl w-full transition-colors ${
-              !isSidebarOpen && 'justify-center'
+              !isSidebarOpen && "justify-center"
             }`}
           >
             <LogOut size={20} className={isSidebarOpen ? "mr-3" : ""} />
@@ -358,22 +390,35 @@ if (authChecked && !isLoggedIn) {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 ${isSidebarOpen ? "ml-64" : "ml-20"} transition-all duration-300`}>
+      <div
+        className={`flex-1 ${
+          isSidebarOpen ? "ml-64" : "ml-20"
+        } transition-all duration-300`}
+      >
         {/* Header */}
         <header className="bg-white shadow-sm py-4 px-6 flex justify-between items-center sticky top-0 z-30">
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 rounded-full hover:bg-[#e0f0fe] text-[#0070cc] transition-colors"
             >
-              {isSidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+              {isSidebarOpen ? (
+                <ChevronLeft size={20} />
+              ) : (
+                <ChevronRight size={20} />
+              )}
             </button>
-            <h1 className="text-xl font-semibold text-[#084b88]">Bienvenue sur votre tableau de bord</h1>
+            <h1 className="text-xl font-semibold text-[#084b88]">
+              Bienvenue sur votre tableau de bord
+            </h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#37aaf8]" size={18} />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#37aaf8]"
+                size={18}
+              />
               <input
                 type="text"
                 value={searchQuery}
@@ -382,53 +427,85 @@ if (authChecked && !isLoggedIn) {
                 className="bg-[#f0f7ff] rounded-full pl-10 pr-4 py-2 w-60 focus:outline-none focus:ring-2 focus:ring-[#108de4] text-sm"
               />
             </div>
-            
+
             <div className="relative">
               <button className="p-2 rounded-full hover:bg-[#e0f0fe] text-[#0070cc] transition-colors">
                 <Bell size={20} />
                 <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
               </button>
             </div>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white cursor-pointer -mt-1" style={{ backgroundColor: "#0058a6", boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)" }}>
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white cursor-pointer -mt-1"
+              style={{
+                backgroundColor: "#0058a6",
+                boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+              }}
+            >
               {userData?.photoURL ? (
-                <img src={userData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                <img
+                  src={userData.photoURL}
+                  alt="Profile"
+                  className="w-full h-full object-cover rounded-full"
+                />
               ) : (
-                <span className="text-base font-bold">{userData?.email?.charAt(0)?.toUpperCase() || "U"}</span>
+                <span className="text-base font-bold">
+                  {userData?.email?.charAt(0)?.toUpperCase() || "U"}
+                </span>
               )}
             </div>
           </div>
         </header>
-        
+
         {/* Main Content */}
         <main className="p-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-[#084b88] text-sm font-medium mb-2">Équipement Total</h3>
-              <p className="text-3xl font-bold text-[#0070cc]">{stats.totalEquipment}</p>
+              <h3 className="text-[#084b88] text-sm font-medium mb-2">
+                Équipement Total
+              </h3>
+              <p className="text-3xl font-bold text-[#0070cc]">
+                {stats.totalEquipment}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-[#084b88] text-sm font-medium mb-2">Annonces Actives</h3>
-              <p className="text-3xl font-bold text-green-500">{stats.active}</p>
+              <h3 className="text-[#084b88] text-sm font-medium mb-2">
+                Annonces Actives
+              </h3>
+              <p className="text-3xl font-bold text-green-500">
+                {stats.active}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-[#084b88] text-sm font-medium mb-2">Annonces En Attente</h3>
-              <p className="text-3xl font-bold text-yellow-500">{stats.pending}</p>
+              <h3 className="text-[#084b88] text-sm font-medium mb-2">
+                Annonces En Attente
+              </h3>
+              <p className="text-3xl font-bold text-yellow-500">
+                {stats.pending}
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-[#084b88] text-sm font-medium mb-2">Revenu Total</h3>
-              <p className="text-3xl font-bold text-[#0070cc]">{stats.revenue} MAD</p>
+              <h3 className="text-[#084b88] text-sm font-medium mb-2">
+                Revenu Total
+              </h3>
+              <p className="text-3xl font-bold text-[#0070cc]">
+                {stats.revenue} MAD
+              </p>
             </div>
           </div>
-          
+
           {/* My Equipment Section */}
           <div className="bg-[#e0f0fe] shadow-sm p-6 mb-8 rounded-xl">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-[#084b88]">Mon Équipement</h2>
-                <p className="text-md text-[#108de4] mt-1">Gérez vos annonces d'équipement médical</p>
+                <h2 className="text-2xl font-bold text-[#084b88]">
+                  Mon Équipement
+                </h2>
+                <p className="text-md text-[#108de4] mt-1">
+                  Gérez vos annonces d'équipement médical
+                </p>
               </div>
-              <button 
+              <button
                 onClick={handleAddEquipment}
                 className="bg-[#0070cc] hover:bg-[#0058a6] text-white px-4 py-2 rounded-lg flex items-center"
               >
@@ -436,31 +513,34 @@ if (authChecked && !isLoggedIn) {
                 Ajouter Nouvel Équipement
               </button>
             </div>
-            
+
             {loading && <div className="text-center py-8">Chargement...</div>}
-            
+
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
                 {error}
-                <button 
-                  onClick={() => setError(null)} 
+                <button
+                  onClick={() => setError(null)}
                   className="absolute top-0 right-0 p-3"
                 >
                   <X size={16} />
                 </button>
               </div>
             )}
-            
+
             {!loading && !error && filteredEquipment.length === 0 ? (
               <div className="text-center py-16 px-6 bg-[#f0f7ff] rounded-xl">
                 <div className="rounded-full p-4 bg-[#e0f0fe] text-[#0070cc] mx-auto w-22 h-22 flex items-center justify-center mb-4">
                   <Package size={60} />
                 </div>
-                <h3 className="font-semibold text-lg text-[#084b88] mb-2">Aucun équipement trouvé</h3>
+                <h3 className="font-semibold text-lg text-[#084b88] mb-2">
+                  Aucun équipement trouvé
+                </h3>
                 <p className="text-[#108de4] mb-6 max-w-md mx-auto">
-                  Vous n'avez pas encore ajouté d'équipement médical. Ajoutez votre premier article pour commencer à le louer.
+                  Vous n'avez pas encore ajouté d'équipement médical. Ajoutez
+                  votre premier article pour commencer à le louer.
                 </p>
-                <button 
+                <button
                   onClick={handleAddEquipment}
                   className="bg-[#0070cc] hover:bg-[#0058a6] text-white px-6 py-3 rounded-lg flex items-center mx-auto"
                 >
@@ -469,56 +549,60 @@ if (authChecked && !isLoggedIn) {
                 </button>
               </div>
             ) : (
-             
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEquipment.map((item) => (
+                  <div
+                    key={item._id}
+                    className="bg-white rounded-xl shadow-md overflow-hidden"
+                  >
+                    <div className="h-50 bg-gray-200 relative">
+                      {item.image ? (
+                        <img
+                          src={`http://localhost:5000${item.image}`}
+                          alt={item.name}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full bg-[#f0f7ff]">
+                          <Package size={64} className="text-[#0070cc]" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg text-[#084b88] mb-2">
+                        {item.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {item.description.length > 100
+                          ? `${item.description.substring(0, 28)}...`
+                          : item.description}
+                      </p>
+                      <p className="text-[#0070cc] font-bold">
+                        {item.price} MAD/
+                        {item.rentalPeriod === "day" ? "jour" : "mois"}
+                      </p>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {filteredEquipment.map((item) => (
-    <div key={item._id} className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="h-50 bg-gray-200 relative">
-        {item.image ? (
-          <img 
-            src={`http://localhost:5000${item.image}`} 
-            alt={item.name} 
-            className="w-full h-full object-contain"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full bg-[#f0f7ff]">
-            <Package size={64} className="text-[#0070cc]" />
-          </div>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-[#084b88] mb-2">{item.name}</h3>
-        <p className="text-sm text-gray-600 mb-2">
-          {item.description.length > 100 
-            ? `${item.description.substring(0, 28)}...` 
-            : item.description}
-        </p>
-        <p className="text-[#0070cc] font-bold">
-          {item.price} MAD/{item.rentalPeriod === 'day' ? 'jour' : 'mois'}
-        </p>
-        
-        {/* Edit and Delete buttons */}
-        <div className="flex justify-end space-x-2 -mt-7">
-          <button 
-            onClick={() => handleEditEquipment(item)}
-            className="p-2 bg-[#e0f0fe] text-[#0070cc] rounded-full hover:bg-[#0070cc] hover:text-white transition-colors"
-            title="Modifier"
-          >
-            <Edit size={16} />
-          </button>
-          <button 
-            onClick={() => handleDeleteClick(item)}
-            className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-colors"
-            title="Supprimer"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+                      {/* Edit and Delete buttons */}
+                      <div className="flex justify-end space-x-2 -mt-7">
+                        <button
+                          onClick={() => handleEditEquipment(item)}
+                          className="p-2 bg-[#e0f0fe] text-[#0070cc] rounded-full hover:bg-[#0070cc] hover:text-white transition-colors"
+                          title="Modifier"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(item)}
+                          className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-colors"
+                          title="Supprimer"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
@@ -527,8 +611,10 @@ if (authChecked && !isLoggedIn) {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl p-6 max-w-md w-full">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-[#084b88]">Confirmer la Suppression</h3>
-                  <button 
+                  <h3 className="text-xl font-semibold text-[#084b88]">
+                    Confirmer la Suppression
+                  </h3>
+                  <button
                     onClick={cancelDelete}
                     className="p-2 rounded-full hover:bg-gray-100"
                   >
@@ -536,7 +622,8 @@ if (authChecked && !isLoggedIn) {
                   </button>
                 </div>
                 <p className="mb-6">
-                  Êtes-vous sûr de vouloir supprimer "{equipmentToDelete?.name}" ? Cette action ne peut pas être annulée.
+                  Êtes-vous sûr de vouloir supprimer "{equipmentToDelete?.name}"
+                  ? Cette action ne peut pas être annulée.
                 </p>
                 <div className="flex justify-end space-x-4">
                   <button
@@ -551,7 +638,7 @@ if (authChecked && !isLoggedIn) {
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                     disabled={loading}
                   >
-                    {loading ? 'Suppression...' : 'Supprimer'}
+                    {loading ? "Suppression..." : "Supprimer"}
                   </button>
                 </div>
               </div>
@@ -562,54 +649,83 @@ if (authChecked && !isLoggedIn) {
           {(showAddForm || showEditForm) && (
             <div className="bg-white p-8 shadow-lg rounded-xl">
               <h2 className="text-2xl font-semibold text-[#084b88] mb-4">
-                {formMode === 'add' ? 'Ajouter Nouvel Équipement' : 'Modifier Équipement'}
+                {formMode === "add"
+                  ? "Ajouter Nouvel Équipement"
+                  : "Modifier Équipement"}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Nom de l'Équipement</label>
-                  <input 
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Nom de l'Équipement
+                  </label>
+                  <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Description</label>
-                  <textarea 
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Description
+                  </label>
+                  <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     rows="4"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Catégorie</label>
-                  <input 
-                    type="text"
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Catégorie
+                  </label>
+                  <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     required
-                  />
+                  >
+                    <option>Toutes les Catégories</option>
+                    <option>Aides à la Mobilité</option>
+                    <option>Équipement Respiratoire</option>
+                    <option>Lits d'Hôpital</option>
+                    <option>Sécurité Salle de Bain</option>
+                    <option>Lève-Personnes</option>
+                    <option>Aides à la Vie Quotidienne</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Prix</label>
-                  <input 
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Prix
+                  </label>
+                  <input
                     type="number"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, price: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Période de Location</label>
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Période de Location
+                  </label>
                   <select
                     value={formData.rentalPeriod}
-                    onChange={(e) => setFormData({ ...formData, rentalPeriod: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rentalPeriod: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                   >
                     <option value="day">Jour</option>
@@ -617,20 +733,33 @@ if (authChecked && !isLoggedIn) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">État</label>
-                  <input 
-                    type="text"
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    État
+                  </label>
+                  <select
                     value={formData.condition}
-                    onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, condition: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     required
-                  />
+                  >
+                    <option>Tous les États</option>
+                    <option>Neuf</option>
+                    <option>Comme Neuf</option>
+                    <option>Excellent</option>
+                    <option>Bon</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Disponibilité</label>
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Disponibilité
+                  </label>
                   <select
                     value={formData.availability}
-                    onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, availability: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                   >
                     <option value="available">Disponible</option>
@@ -638,20 +767,68 @@ if (authChecked && !isLoggedIn) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Emplacement</label>
-                  <input 
-                    type="text"
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Emplacement
+                  </label>
+                  <select
                     value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
                     className="w-full p-3 bg-[#f0f7ff] border border-[#ccc] rounded-lg"
                     required
-                  />
+                  >
+                    <option>Toutes les Villes</option>
+                    <option>Casablanca</option>
+                    <option>Rabat</option>
+                    <option>Marrakech</option>
+                    <option>Fès</option>
+                    <option>Tanger</option>
+                    <option>Agadir</option>
+                    <option>Meknès</option>
+                    <option>Oujda</option>
+                    <option>Kénitra</option>
+                    <option>Tétouan</option>
+                    <option>Safi</option>
+                    <option>Mohammedia</option>
+                    <option>El Jadida</option>
+                    <option>Béni Mellal</option>
+                    <option>Nador</option>
+                    <option>Khouribga</option>
+                    <option>Settat</option>
+                    <option>Berrechid</option>
+                    <option>Taza</option>
+                    <option>Khemisset</option>
+                    <option>Essaouira</option>
+                    <option>Taourirt</option>
+                    <option>Ouarzazate</option>
+                    <option>Larache</option>
+                    <option>Ksar El Kébir</option>
+                    <option>Chefchaouen</option>
+                    <option>Al Hoceima</option>
+                    <option>Errachidia</option>
+                    <option>Guelmim</option>
+                    <option>Dakhla</option>
+                    <option>Laâyoune</option>
+                    <option>Ifrane</option>
+                    <option>Tiznit</option>
+                    <option>Taroudant</option>
+                    <option>Azrou</option>
+                    <option>Midelt</option>
+                    <option>Tan-Tan</option>
+                    <option>Ouazzane</option>
+                    <option>Zagora</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#084b88]">Image</label>
-                  {formMode === 'edit' && (
+                  <label className="block text-sm font-medium text-[#084b88]">
+                    Image
+                  </label>
+                  {formMode === "edit" && (
                     <p className="text-sm text-gray-500 mb-2">
-                      {currentEquipment?.image ? 'Laissez vide pour conserver l\'image actuelle' : 'Pas d\'image actuelle'}
+                      {currentEquipment?.image
+                        ? "Laissez vide pour conserver l'image actuelle"
+                        : "Pas d'image actuelle"}
                     </p>
                   )}
                   <input
@@ -675,7 +852,13 @@ if (authChecked && !isLoggedIn) {
                     className="bg-[#0070cc] hover:bg-[#0058a6] text-white py-3 px-6 rounded-lg"
                     disabled={loading}
                   >
-                    {loading ? (formMode === 'add' ? 'Ajout en cours...' : 'Mise à jour...') : (formMode === 'add' ? 'Ajouter Équipement' : 'Mettre à jour Équipement')}
+                    {loading
+                      ? formMode === "add"
+                        ? "Ajout en cours..."
+                        : "Mise à jour..."
+                      : formMode === "add"
+                      ? "Ajouter Équipement"
+                      : "Mettre à jour Équipement"}
                   </button>
                 </div>
               </form>

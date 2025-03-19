@@ -9,17 +9,44 @@ const Profile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsLoggedIn(true);
-      setUserData(JSON.parse(user));
-    }
-    setAuthChecked(true);
-  }, [navigate]);
+    const fetchUserData = async () => {
+      const user = localStorage.getItem("user");
+      if (user) {
+        const parsedUser = JSON.parse(user);
+        setIsLoggedIn(true);
+        setUserData(parsedUser);
+
+        try {
+          // Fetch user data from the registration endpoint
+          const response = await fetch(`http://localhost:5000/api/users/register/${parsedUser.id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${parsedUser.token}`
+            }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            setUserData(prevData => ({
+              ...prevData,
+              createdAt: userData.createdAt
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+      setAuthChecked(true);
+      setIsLoading(false);
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -27,8 +54,18 @@ const Profile = () => {
     navigate("/login2");
   };
 
+  // Format the createdAt date from user data
+  const formatMemberDate = () => {
+    if (userData && userData.createdAt) {
+      const date = new Date(userData.createdAt);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('fr-FR', options);
+    }
+    return 'Date non disponible';
+  };
+
   // Show loading state
-  if (!authChecked) {
+  if (isLoading || !authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff]">
         <div className="text-[#0070cc] text-xl">Chargement...</div>
@@ -75,14 +112,6 @@ const Profile = () => {
       </div>
     );
   }
-
-  // Format the createdAt date from user data
-  const formatMemberDate = () => {
-    if (userData && userData.createdAt) {
-      return new Date(userData.createdAt).toLocaleDateString();
-    }
-    return new Date().toLocaleDateString();
-  };
 
   return (
     <div className="min-h-screen flex flex-col">

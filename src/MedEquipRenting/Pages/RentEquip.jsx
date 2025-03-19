@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../Components/Header';
 import FiltringSidebar from '../Components/FiltringSidebar';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
 
 function RentEquip() {
   const [equipment, setEquipment] = useState([]);
@@ -20,9 +20,9 @@ function RentEquip() {
     const fetchEquipment = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/equipment');
-        setEquipment(response.data);
-        setFilteredEquipment(response.data);
+        const response = await axiosInstance.get('/equipment');
+        setEquipment(response.data.data);
+        setFilteredEquipment(response.data.data);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch equipment data');

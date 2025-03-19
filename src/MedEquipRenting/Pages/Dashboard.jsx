@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import {
   Bell,
   Search,
@@ -77,12 +77,12 @@ const Dashboard = () => {
     setLoading(true);
     try {
       // Fetch equipment
-      const equipmentRes = await axios.get(`${API_URL}/equipment`);
-      setEquipment(equipmentRes.data);
+      const equipmentRes = await axiosInstance.get('/equipment');
+      setEquipment(equipmentRes.data.data);
 
       // Fetch stats
-      const statsRes = await axios.get(`${API_URL}/stats`);
-      setStats(statsRes.data);
+      const statsRes = await axiosInstance.get('/stats');
+      setStats(statsRes.data.data);
 
       setError(null);
     } catch (err) {
@@ -166,7 +166,7 @@ const Dashboard = () => {
 
     setLoading(true);
     try {
-      await axios.delete(`${API_URL}/equipment/${equipmentToDelete._id}`);
+      await axiosInstance.delete(`/equipment/${equipmentToDelete._id}`);
 
       // Remove deleted item from state
       setEquipment((prev) =>
@@ -218,30 +218,18 @@ const Dashboard = () => {
 
       if (formMode === "add") {
         // Send POST request to add equipment
-        response = await axios.post(`${API_URL}/equipment`, formDataObj, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        response = await axiosInstance.post('/equipment', formDataObj);
 
         // Add new equipment to state
-        setEquipment((prev) => [response.data, ...prev]);
+        setEquipment((prev) => [response.data.data, ...prev]);
       } else if (formMode === "edit" && currentEquipment) {
         // Send PUT request to update equipment
-        response = await axios.put(
-          `${API_URL}/equipment/${currentEquipment._id}`,
-          formDataObj,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        response = await axiosInstance.put(`/equipment/${currentEquipment._id}`, formDataObj);
 
         // Update equipment in state
         setEquipment((prev) =>
           prev.map((item) =>
-            item._id === currentEquipment._id ? response.data : item
+            item._id === currentEquipment._id ? response.data.data : item
           )
         );
       }

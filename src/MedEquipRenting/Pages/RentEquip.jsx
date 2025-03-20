@@ -111,7 +111,7 @@ function RentEquip() {
                       
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-blue-600 font-bold">
-                          ${item.price}/{item.rentalPeriod}
+                        {item.price} DH/{item.rentalPeriod}
                         </span>
                         <span className={`px-2 py-1 text-xs rounded ${
                           item.availability === 'available' 

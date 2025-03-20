@@ -64,25 +64,47 @@ const Dashboard = () => {
     // Check if user is logged in
     const user = localStorage.getItem("user");
     if (user) {
+      const parsedUser = JSON.parse(user);
       setIsLoggedIn(true);
-      setUserData(JSON.parse(user));
+      setUserData(parsedUser);
       setActiveMenuItem(location.pathname);
-      fetchData();
+    } else {
+      // Redirect to login if no user data
+      navigate("/login2");
     }
     setAuthChecked(true);
-  }, [location]);
+  }, [location, navigate]);
+
+  useEffect(() => {
+    // Only fetch data if we have user data
+    if (userData && userData.id) {
+      fetchData();
+    }
+  }, [userData]);
 
   // Fetch equipment and stats from API
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Fetch equipment for the current user only
+      const userId = userData.id; // Changed from _id to id to match the server response
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
       // Fetch equipment
       const equipmentRes = await axiosInstance.get('/equipment');
-      setEquipment(equipmentRes.data.data);
+      const userEquipment = equipmentRes.data.data.filter(item => item.userId === userId);
+      setEquipment(userEquipment);
 
-      // Fetch stats
-      const statsRes = await axiosInstance.get('/stats');
-      setStats(statsRes.data.data);
+      // For now, calculate stats based on filtered equipment
+      const stats = {
+        totalEquipment: userEquipment.length,
+        active: userEquipment.filter(item => item.availability === 'available').length,
+        pending: userEquipment.filter(item => item.availability === 'pending').length,
+        revenue: userEquipment.reduce((acc, item) => acc + (item.price || 0), 0)
+      };
+      setStats(stats);
 
       setError(null);
     } catch (err) {
@@ -166,11 +188,11 @@ const Dashboard = () => {
 
     setLoading(true);
     try {
-      await axiosInstance.delete(`/equipment/${equipmentToDelete._id}`);
+      await axiosInstance.delete(`/equipment/${equipmentToDelete.id}`);
 
       // Remove deleted item from state
       setEquipment((prev) =>
-        prev.filter((item) => item._id !== equipmentToDelete._id)
+        prev.filter((item) => item.id !== equipmentToDelete.id)
       );
 
       // Close modal
@@ -224,12 +246,12 @@ const Dashboard = () => {
         setEquipment((prev) => [response.data.data, ...prev]);
       } else if (formMode === "edit" && currentEquipment) {
         // Send PUT request to update equipment
-        response = await axiosInstance.put(`/equipment/${currentEquipment._id}`, formDataObj);
+        response = await axiosInstance.put(`/equipment/${currentEquipment.id}`, formDataObj);
 
         // Update equipment in state
         setEquipment((prev) =>
           prev.map((item) =>
-            item._id === currentEquipment._id ? response.data.data : item
+            item.id === currentEquipment.id ? response.data.data : item
           )
         );
       }
@@ -477,7 +499,8 @@ const Dashboard = () => {
                 Revenu Total
               </h3>
               <p className="text-3xl font-bold text-[#0070cc]">
-                {stats.revenue} MAD
+                {/*{stats.revenue}*/}
+                0 MAD
               </p>
             </div>
           </div>
@@ -540,7 +563,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEquipment.map((item) => (
                   <div
-                    key={item._id}
+                    key={item.id}
                     className="bg-white rounded-xl shadow-md overflow-hidden"
                   >
                     <div className="h-50 bg-gray-200 relative">

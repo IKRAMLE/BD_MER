@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Components/Header';
 import FiltringSidebar from '../Components/FiltringSidebar';
 import axiosInstance from '../../utils/axiosConfig';
+import { Heart } from 'lucide-react';
 
 function RentEquip() {
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredEquipment, setFilteredEquipment] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [filters, setFilters] = useState({
     category: '',
     priceRange: { min: 0, max: 10000 },
@@ -34,34 +36,80 @@ function RentEquip() {
     fetchEquipment();
   }, []);
 
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+  }, []);
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (itemId) => {
+    setFavorites(prevFavorites => {
+      if (prevFavorites.includes(itemId)) {
+        return prevFavorites.filter(id => id !== itemId);
+      } else {
+        return [...prevFavorites, itemId];
+      }
+    });
+  };
+
+  const addToCart = (item) => {
+    // Get existing cart items
+    const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    
+    // Check if item already exists
+    const existingItem = existingCart.find(cartItem => cartItem.id === item._id);
+    
+    let newCart;
+    if (existingItem) {
+      // Update quantity if item exists
+      newCart = existingCart.map(cartItem =>
+        cartItem.id === item._id
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem
+      );
+    } else {
+      // Add new item
+      newCart = [...existingCart, {
+        id: item._id,
+        name: item.name,
+        price: item.price,
+        image: item.image ? `http://localhost:5000${item.image}` : '/api/placeholder/100/100',
+        days: 7,
+        quantity: 1
+      }];
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('cart', JSON.stringify(newCart));
+    
+    // Update cart count in header by dispatching an event
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart.length }));
+  };
+
   // Handle filter changes from sidebar
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-    
-    // Apply filters to equipment
     let filtered = equipment;
-    
-    // Filter by category
     if (newFilters.category) {
       filtered = filtered.filter(item => item.category === newFilters.category);
     }
-    
-    // Filter by price range
     filtered = filtered.filter(item => 
       item.price >= newFilters.priceRange.min && 
       item.price <= newFilters.priceRange.max
     );
-    
-    // Filter by availability
     if (newFilters.availability) {
       filtered = filtered.filter(item => item.availability === newFilters.availability);
     }
-    
-    // Filter by condition
     if (newFilters.condition) {
       filtered = filtered.filter(item => item.condition === newFilters.condition);
     }
-    
     setFilteredEquipment(filtered);
   };
 
@@ -72,7 +120,9 @@ function RentEquip() {
         <FiltringSidebar onFilterChange={handleFilterChange} />
         
         <main className="flex-1 p-5 mt-23 ml-3">
-          <h1 className="text-2xl font-bold mb-6">Rent Medical Equipment</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Rent Medical Equipment</h1>
+          </div>
           
           {loading ? (
             <div className="flex justify-center items-center h-64">
@@ -91,7 +141,7 @@ function RentEquip() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEquipment.map(item => (
                   <div key={item._id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                    <div className="h-48 overflow-hidden bg-gray-100">
+                    <div className="h-48 overflow-hidden bg-gray-100 relative">
                       {item.image ? (
                         <img 
                           src={`http://localhost:5000${item.image}`} 
@@ -103,6 +153,19 @@ function RentEquip() {
                           <span className="text-gray-400">No image</span>
                         </div>
                       )}
+                      <button
+                        onClick={() => toggleFavorite(item._id)}
+                        className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
+                      >
+                        <Heart
+                          size={20}
+                          className={`${
+                            favorites.includes(item._id)
+                              ? "fill-red-500 text-red-500"
+                              : "text-gray-400"
+                          }`}
+                        />
+                      </button>
                     </div>
                     
                     <div className="p-4">
@@ -128,8 +191,16 @@ function RentEquip() {
                         <span className="px-2 py-1 text-xs bg-gray-100 rounded">{item.location}</span>
                       </div>
                       
-                      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition-colors">
-                        Rent Now
+                      <button 
+                        onClick={() => addToCart(item)}
+                        disabled={item.availability !== 'available'}
+                        className={`w-full py-2 rounded transition-colors ${
+                          item.availability === 'available'
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {item.availability === 'available' ? 'Rent Now' : 'Not Available'}
                       </button>
                     </div>
                   </div>

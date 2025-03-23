@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Package, Edit, Trash2, Plus } from "lucide-react";
+import { Package, Edit, Trash2, Plus, Compass, TrendingUp, User, Heart, Settings } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
 
@@ -15,8 +15,12 @@ const MyEquipmentPage = () => {
   const [userData, setUserData] = useState(null);
 
   const menuItems = [
-    { icon: Package, text: "Tableau de bord", path: "/dashboard" },
+    { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
     { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
+    { icon: TrendingUp, text: "Analytiques", path: "/analytics" },
+    { icon: User, text: "Profil", path: "/profile" },
+    { icon: Heart, text: "Favoris", path: "/favorites" },
+    { icon: Settings, text: "Paramètres", path: "/settings" },
   ];
 
   useEffect(() => {

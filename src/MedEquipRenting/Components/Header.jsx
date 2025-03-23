@@ -6,7 +6,7 @@ import ShoppingCartComponent from "../Components/ShoppingCard";
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(2); 
+  const [cartCount, setCartCount] = useState(0); 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
   const dropdownTimeout = useRef(null);
@@ -18,6 +18,27 @@ const Navbar = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Load cart count from localStorage and listen for updates
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartCount(cart.length);
+    };
+
+    // Initial load
+    updateCartCount();
+
+    // Listen for cart updates
+    const handleCartUpdate = (event) => {
+      setCartCount(event.detail);
+    };
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
   }, []);
 
   // Handle dropdown hover behavior
@@ -158,7 +179,7 @@ const Navbar = () => {
       <ShoppingCartComponent 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)}
-        cartCount={cartCount}
+        cartItems={JSON.parse(localStorage.getItem('cart') || '[]')}
       />
     </>
   );

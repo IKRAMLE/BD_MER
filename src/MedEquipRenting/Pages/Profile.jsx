@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { User, Settings, Package, LogOut, AlertCircle } from "lucide-react";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
 
 const Profile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -115,13 +113,12 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
 
-      <div className="flex-grow py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#f0f7ff] mt-10">
+      <div className="flex-grow py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#f2f5f8] to-[#f0f7ff] -mt-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Sidebar */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="bg-white rounded-2xl shadow-2xl p-6">
               <div className="flex flex-col items-center mb-8">
                 <div className="h-24 w-24 rounded-full bg-[#108de4] flex items-center justify-center text-white text-3xl mb-4">
                   <User size={40} />
@@ -188,16 +185,16 @@ const Profile = () => {
 
                 <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-md">
                   <h3 className="text-lg font-medium mb-1">
-                    Ajouter Nouvel Équipement
+                    Parcourir l'Équipement
                   </h3>
                   <p className="text-green-100 mb-4">
-                    Partagez votre équipement médical
+                    Trouvez l'équipement médical dont vous avez besoin
                   </p>
                   <Link
-                    to="/add-equipment"
+                    to="/rent-equip"
                     className="inline-block px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors"
                   >
-                    Ajouter Équipement
+                    Parcourir l'Équipement
                   </Link>
                 </div>
               </div>
@@ -237,7 +234,6 @@ const Profile = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

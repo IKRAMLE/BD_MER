@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Compass, TrendingUp, User, Heart, Plus, Package, Settings } from "lucide-react";
+import { Compass, TrendingUp, User, Heart, Package, Settings } from "lucide-react";
 import logo from "/caduceus.png";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
@@ -113,7 +113,6 @@ const Dashboard = () => {
     { icon: TrendingUp, text: "Analytiques", path: "/analytics" },
     { icon: User, text: "Profil", path: "/profile" },
     { icon: Heart, text: "Favoris", path: "/favorites" },
-    { icon: Plus, text: "Ajouter Équipement", path: "/add-equipment" },
     { icon: Settings, text: "Paramètres", path: "/settings" },
   ];
 

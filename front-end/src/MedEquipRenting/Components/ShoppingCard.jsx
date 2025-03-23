@@ -4,19 +4,11 @@ import { X, ShoppingBag, Trash2, CreditCard, ArrowRight, Heart, Gift } from "luc
 const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateCartItemQuantity }) => {
   const [animateItems, setAnimateItems] = useState(false);
   
-  // Use passed cart items or default to empty array
-  const items = cartItems.length > 0 ? cartItems : [
-    { id: 1, name: "Moniteur cardiaque", price: 35, image: "/api/placeholder/100/100", days: 7, quantity: 1 },
-    { id: 2, name: "Tensiomètre digital", price: 25, image: "/api/placeholder/100/100", days: 5, quantity: 1 },
-    { id: 3, name: "digital", price: 25, image: "/api/placeholder/100/100", days: 4, quantity: 1 },
-    { id: 4, name: "Tensiomètre", price: 25, image: "/api/placeholder/100/100", days: 2, quantity: 1 }
-  ];
-  
-  const isEmpty = items.length === 0;
-  const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+  const isEmpty = cartItems.length === 0;
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   
   const calculateTotal = () => {
-    return items.reduce((total, item) => total + (item.price * item.days * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.price * item.days * item.quantity), 0);
   };
   
   // Handle item removal with fallback if no function is provided
@@ -102,7 +94,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
           ) : (
             <>
               <div className="space-y-4 max-h-64 overflow-y-auto">
-                {items.map((item, index) => (
+                {cartItems.map((item, index) => (
                   <div 
                     key={item.id} 
                     className={`flex items-center p-3 bg-blue-50 rounded-lg transform transition-all duration-500 ${animateItems ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}
@@ -126,7 +118,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                         </button>
                       </div>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <span>{item.price} € / jour × {item.days} jours</span>
+                        <span>{item.price} DH / jour × {item.days} jours</span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center bg-white rounded-full border border-gray-200">
@@ -144,7 +136,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                             +
                           </button>
                         </div>
-                        <span className="font-medium text-blue-600">{item.price * item.days * item.quantity} €</span>
+                        <span className="font-medium text-blue-600">{item.price * item.days * item.quantity} DH</span>
                       </div>
                     </div>
                   </div>
@@ -159,11 +151,11 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-500">Frais de service</span>
-                  <span>5.00 €</span>
+                  <span>20.00 DH</span>
                 </div>
                 <div className="flex justify-between font-medium mt-4">
                   <span>Total</span>
-                  <span className="text-blue-600 text-lg">{calculateTotal() + 5} €</span>
+                  <span className="text-blue-600 text-lg">{calculateTotal() + 20} DH</span>
                 </div>
                 
                 {/* Checkout button */}

@@ -5,14 +5,16 @@ import { Package, Edit, Trash2, Plus, Compass, TrendingUp, User, Heart, Settings
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
 
+const API_URL = 'http://localhost:5000';
+
 const MyEquipmentPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userData, setUserData] = useState(null);
+  const navigate = useNavigate();
+  const [userData] = useState(JSON.parse(localStorage.getItem("user")));
 
   const menuItems = [
     { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
@@ -24,18 +26,7 @@ const MyEquipmentPage = () => {
   ];
 
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("user");
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      setUserData(parsedUser);
-    } else {
-      navigate("/login2");
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    if (userData && userData.id) {
+    if (userData) {
       fetchEquipment();
     }
   }, [userData]);
@@ -48,8 +39,18 @@ const MyEquipmentPage = () => {
         throw new Error("User ID not found");
       }
 
+      console.log("Fetching equipment for user:", userId);
       const response = await axiosInstance.get('/equipment');
-      const userEquipment = response.data.data.filter(item => item.userId === userId);
+      console.log("Raw API response:", response.data);
+      
+      const userEquipment = response.data.data
+        .filter(item => item.userId === userId)
+        .map(item => ({
+          ...item,
+          image: item.image && !item.image.startsWith('http') ? `${API_URL}${item.image}` : item.image
+        }));
+      
+      console.log("Processed equipment:", userEquipment);
       setEquipment(userEquipment);
       setError(null);
     } catch (err) {
@@ -60,24 +61,22 @@ const MyEquipmentPage = () => {
     }
   };
 
-  const handleMenuClick = (path) => {
-    navigate(path);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login2");
+  const handleViewDetails = (item) => {
+    console.log("Viewing details for item:", item);
+    if (item && item._id) {
+      const url = `/equipment/${item._id}`;
+      console.log("Navigating to:", url);
+      navigate(url);
+    } else {
+      console.error("Invalid equipment item:", item);
+    }
   };
 
   const handleAddEquipment = () => {
-    navigate("/dashboard");
+    navigate("/rent-equip");
   };
 
-  const handleEditEquipment = (item) => {
-    navigate("/dashboard", { state: { editEquipment: item } });
-  };
-
-  const handleDeleteClick = (item) => {
+  const handleDeleteEquipment = (item) => {
     navigate("/dashboard", { state: { deleteEquipment: item } });
   };
 
@@ -85,100 +84,52 @@ const MyEquipmentPage = () => {
   const filteredEquipment = equipment.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getStatusColor = (availability) => {
-    switch (availability) {
-      case 'available':
-        return 'text-green-600 bg-green-50';
-      case 'pending':
-        return 'text-yellow-600 bg-yellow-50';
-      case 'not-available':
-        return 'text-red-600 bg-red-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  const getStatusText = (availability) => {
-    switch (availability) {
-      case 'available':
-        return 'Disponible';
-      case 'pending':
-        return 'En attente';
-      case 'not-available':
-        return 'Non disponible';
-      default:
-        return 'Inconnu';
-    }
-  };
-
   return (
     <div className="flex h-screen bg-[#f0f7ff]">
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        menuItems={menuItems}
-        activeMenuItem="/my-equipment"
-        handleMenuClick={handleMenuClick}
-        handleLogout={handleLogout}
-      />
-
-      <div className={`flex-1 ${isSidebarOpen ? "ml-64" : "ml-20"}`}>
-        <DashboardHeader
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          userData={userData}
-          handleLogout={handleLogout}
-        />
-
-        <main className="p-8">
-          <div className="bg-[#e0f0fe] shadow-sm p-6 mb-8 rounded-xl">
+      <Sidebar isOpen={isSidebarOpen} menuItems={menuItems} />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+        
+        <main className="flex-1 overflow-y-auto p-4">
+          <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-[#084b88]">
-                  Mon Équipement
-                </h2>
-                <p className="text-md text-[#108de4] mt-1">
-                  Gérez vos annonces d'équipement médical
-                </p>
-              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Mon Équipement</h1>
               <button
                 onClick={handleAddEquipment}
                 className="bg-[#0070cc] hover:bg-[#0058a6] text-white px-4 py-2 rounded-lg flex items-center"
               >
-                <Plus size={18} className="mr-2" />
-                Ajouter Nouvel Équipement
+                <Plus size={20} className="mr-2" />
+                Ajouter un équipement
               </button>
             </div>
 
-            {loading && (
-              <div className="bg-white rounded-lg p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0070cc] mx-auto"></div>
-                <p className="text-center mt-4 text-[#108de4]">Chargement de vos équipements...</p>
-              </div>
-            )}
+            <div className="mb-6">
+              <input
+                type="text"
+                placeholder="Rechercher un équipement..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-                <p className="font-medium">Une erreur est survenue</p>
-                <p className="text-sm">{error}</p>
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0070cc]"></div>
               </div>
-            )}
-
-            {!loading && !error && filteredEquipment.length === 0 ? (
-              <div className="text-center py-16 px-6 bg-white rounded-xl shadow-sm">
-                <div className="rounded-full p-4 bg-[#e0f0fe] text-[#0070cc] mx-auto w-20 h-20 flex items-center justify-center mb-4">
-                  <Package size={40} />
-                </div>
-                <h3 className="font-semibold text-lg text-[#084b88] mb-2">
-                  Aucun équipement trouvé
-                </h3>
-                <p className="text-[#108de4] mb-6 max-w-md mx-auto">
-                  Vous n'avez pas encore ajouté d'équipement médical. Ajoutez votre premier article pour commencer à le louer.
+            ) : error ? (
+              <div className="bg-red-50 p-4 rounded-lg">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : equipment.length === 0 ? (
+              <div className="text-center py-12">
+                <Package size={48} className="mx-auto text-gray-400 mb-4" />
+                <p className="text-xl text-gray-600 mb-4">
+                  Vous n'avez pas encore d'équipement
                 </p>
                 <button
                   onClick={handleAddEquipment}
@@ -188,7 +139,7 @@ const MyEquipmentPage = () => {
                   Ajouter Votre Premier Équipement
                 </button>
               </div>
-            ) : !loading && !error && (
+            ) : (
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -204,13 +155,7 @@ const MyEquipmentPage = () => {
                           Prix
                         </th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Période
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           État
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Statut
                         </th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Ville
@@ -222,14 +167,18 @@ const MyEquipmentPage = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredEquipment.map((item) => (
-                        <tr key={item._id} className="hover:bg-gray-50">
+                        <tr 
+                          key={item._id} 
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() => handleViewDetails(item)}
+                        >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="h-10 w-10 flex-shrink-0">
                                 {item.image ? (
                                   <img
                                     className="h-10 w-10 rounded-lg object-cover"
-                                    src={`http://localhost:5000${item.image}`}
+                                    src={item.image}
                                     alt={item.name}
                                   />
                                 ) : (
@@ -240,52 +189,32 @@ const MyEquipmentPage = () => {
                               </div>
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                                <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
+                                <div className="text-sm text-gray-500">{item.description}</div>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.category}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{item.category}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{item.price} MAD</div>
-                            <div className="text-xs text-gray-500">
-                              Par {item.rentalPeriod === 'day' ? 'jour' : 
-                                  item.rentalPeriod === 'week' ? 'semaine' : 'mois'}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.rentalPeriod === 'day' ? 'Jour' : 
-                             item.rentalPeriod === 'week' ? 'Semaine' : 'Mois'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.condition}
+                            <div className="text-sm text-gray-900">{item.price} DH</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(item.availability)}`}>
-                              {getStatusText(item.availability)}
-                            </span>
+                            <div className="text-sm text-gray-900">{item.condition}</div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {item.location}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{item.location}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex justify-end space-x-3">
-                              <button
-                                onClick={() => handleEditEquipment(item)}
-                                className="p-1.5 bg-[#e0f0fe] text-[#0070cc] rounded-lg hover:bg-[#0070cc] hover:text-white transition-colors"
-                                title="Modifier"
-                              >
-                                <Edit size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteClick(item)}
-                                className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
-                                title="Supprimer"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteEquipment(item);
+                              }}
+                              className="text-red-600 hover:text-red-900 ml-4"
+                            >
+                              <Trash2 size={18} />
+                            </button>
                           </td>
                         </tr>
                       ))}

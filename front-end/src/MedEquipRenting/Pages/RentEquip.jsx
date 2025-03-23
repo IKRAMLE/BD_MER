@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import FiltringSidebar from '../Components/FiltringSidebar';
 import axiosInstance from '../../utils/axiosConfig';
 import { Heart } from 'lucide-react';
 
 function RentEquip() {
+  const navigate = useNavigate();
   const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,6 +89,13 @@ function RentEquip() {
     window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart.length }));
   };
 
+  const handleViewDetails = (item) => {
+    if (item && item._id) {
+      console.log("Navigating to equipment details:", item._id);
+      navigate(`/equipment/${item._id}`);
+    }
+  };
+
   // Handle filter changes from sidebar
   const handleFilterChange = (filters) => {
     let filtered = [...equipment];
@@ -161,7 +170,10 @@ function RentEquip() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEquipment.map(item => (
                   <div key={item._id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                    <div className="h-48 overflow-hidden bg-gray-100 relative">
+                    <div 
+                      className="h-48 overflow-hidden bg-gray-100 relative cursor-pointer"
+                      onClick={() => handleViewDetails(item)}
+                    >
                       {item.image ? (
                         <img 
                           src={`http://localhost:5000${item.image}`} 
@@ -174,7 +186,10 @@ function RentEquip() {
                         </div>
                       )}
                       <button
-                        onClick={() => toggleFavorite(item._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(item._id);
+                        }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
                       >
                         <Heart
@@ -189,8 +204,13 @@ function RentEquip() {
                     </div>
                     
                     <div className="p-4">
-                      <h2 className="text-xl font-semibold mb-2">{item.name}</h2>
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</p>
+                      <div 
+                        className="cursor-pointer"
+                        onClick={() => handleViewDetails(item)}
+                      >
+                        <h2 className="text-xl font-semibold mb-2">{item.name}</h2>
+                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</p>
+                      </div>
                       
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-blue-600 font-bold">

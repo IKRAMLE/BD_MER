@@ -9,6 +9,7 @@ const Navbar = () => {
   const [cartCount, setCartCount] = useState(0); 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const dropdownTimeout = useRef(null);
 
   // Handle scrolling effect on navbar
@@ -20,19 +21,20 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Load cart count from localStorage and listen for updates
+  // Load cart items from localStorage and listen for updates
   useEffect(() => {
-    const updateCartCount = () => {
+    const updateCart = () => {
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartItems(cart);
       setCartCount(cart.length);
     };
 
     // Initial load
-    updateCartCount();
+    updateCart();
 
     // Listen for cart updates
-    const handleCartUpdate = (event) => {
-      setCartCount(event.detail);
+    const handleCartUpdate = () => {
+      updateCart();
     };
     window.addEventListener('cartUpdated', handleCartUpdate);
 
@@ -63,6 +65,27 @@ const Navbar = () => {
       setTimeout(() => setCartBounce(false), 300);
     }
     setIsCartOpen(!isCartOpen);
+  };
+
+  // Handle removing item from cart
+  const handleRemoveFromCart = (itemId) => {
+    const updatedCart = cartItems.filter(item => item.id !== itemId);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    setCartItems(updatedCart);
+    setCartCount(updatedCart.length);
+    // Dispatch event to notify other components
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: updatedCart.length }));
+  };
+
+  // Handle updating item quantity
+  const handleUpdateQuantity = (itemId, newQuantity) => {
+    const updatedCart = cartItems.map(item => 
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    );
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    setCartItems(updatedCart);
+    // Dispatch event to notify other components
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: updatedCart.length }));
   };
 
   return (
@@ -99,9 +122,6 @@ const Navbar = () => {
                     </a>
                     <a href="#how-it-works" className="block px-4 py-2 hover:bg-gray-100 transition-colors">
                       Comment ça marche
-                    </a>
-                    <a href="#testimonials" className="block px-4 py-2 hover:bg-gray-100 transition-colors">
-                      Témoignages
                     </a>
                     <a href="#vision" className="block px-4 py-2 hover:bg-gray-100 transition-colors">
                       Notre vision pour l'avenir
@@ -179,7 +199,9 @@ const Navbar = () => {
       <ShoppingCartComponent 
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)}
-        cartItems={JSON.parse(localStorage.getItem('cart') || '[]')}
+        cartItems={cartItems}
+        removeFromCart={handleRemoveFromCart}
+        updateCartItemQuantity={handleUpdateQuantity}
       />
     </>
   );

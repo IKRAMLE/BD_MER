@@ -1,376 +1,300 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { Package, Plus, Search, User, AlertCircle } from "lucide-react";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
+import axiosInstance from "../../utils/axiosConfig";
+import { Package, Edit, Trash2, Plus } from "lucide-react";
+import DashboardHeader from "../Components/DashboardHeader";
+import Sidebar from "../Components/Sidebar";
 
-const MyEquipment = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [products, setProducts] = useState([]);
+const MyEquipmentPage = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState("name");
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const navigate = useNavigate();
+  const [equipment, setEquipment] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
 
-  // Check authentication first
+  const menuItems = [
+    { icon: Package, text: "Tableau de bord", path: "/dashboard" },
+    { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
+  ];
+
   useEffect(() => {
-    try {
-      const user = localStorage.getItem("user");
-      if (user) {
-        setIsLoggedIn(true);
-        setUserData(JSON.parse(user));
-      }
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-    } finally {
-      setAuthChecked(true);
+    // Check if user is logged in
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      setUserData(parsedUser);
+    } else {
+      navigate("/login2");
     }
-  }, []);
+  }, [navigate]);
 
-  // Fetch equipment data based on current filters
+  useEffect(() => {
+    if (userData && userData.id) {
+      fetchEquipment();
+    }
+  }, [userData]);
+
   const fetchEquipment = async () => {
-    if (!isLoggedIn) return;
-    
     setLoading(true);
-    setError(null);
-    
     try {
-      // Build query parameters
-      const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
-      if (sortField) params.append("sort", sortField);
-      if (sortDirection) params.append("order", sortDirection);
-      if (categoryFilter !== "all") params.append("category", categoryFilter);
-      
-      // Get user ID for filtering by owner
-      if (userData && userData.id) {
-        params.append("userId", userData.id);
+      const userId = userData.id;
+      if (!userId) {
+        throw new Error("User ID not found");
       }
-      
-      // Make API request
-      const response = await fetch(`http://localhost:5000/api/equipment?${params.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch equipment");
-      }
-      
-      const data = await response.json();
-      setProducts(data);
-    } catch (error) {
-      console.error("Error fetching equipment:", error);
-      setError(error.message);
-      
-      // Fallback to local storage in case API fails
-      try {
-        const productsJSON = localStorage.getItem("userProducts");
-        if (productsJSON) {
-          setProducts(JSON.parse(productsJSON));
-        }
-      } catch (storageError) {
-        console.error("Error reading from localStorage:", storageError);
-      }
+
+      const response = await axiosInstance.get('/equipment');
+      const userEquipment = response.data.data.filter(item => item.userId === userId);
+      setEquipment(userEquipment);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching equipment:", err);
+      setError("Échec du chargement des données. Veuillez réessayer plus tard.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch equipment after authentication check
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchEquipment();
-    }
-  }, [isLoggedIn]);
-
-  // Refetch equipment when filters change
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchEquipment();
-    }
-  }, [searchQuery, sortField, sortDirection, categoryFilter]);
+  const handleMenuClick = (path) => {
+    navigate(path);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setIsLoggedIn(false);
     navigate("/login2");
   };
 
-  const handleSortChange = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
+  const handleAddEquipment = () => {
+    navigate("/dashboard");
+  };
+
+  const handleEditEquipment = (item) => {
+    navigate("/dashboard", { state: { editEquipment: item } });
+  };
+
+  const handleDeleteClick = (item) => {
+    navigate("/dashboard", { state: { deleteEquipment: item } });
+  };
+
+  // Filter equipment based on search query
+  const filteredEquipment = equipment.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (availability) => {
+    switch (availability) {
+      case 'available':
+        return 'text-green-600 bg-green-50';
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-50';
+      case 'not-available':
+        return 'text-red-600 bg-red-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
     }
   };
 
-  // Show loading state while checking authentication
-  if (!authChecked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff]">
-        <div className="text-[#0070cc] text-xl">Chargement...</div>
-      </div>
-    );
-  }
-
-  // Show authentication required message
-  if (authChecked && !isLoggedIn) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-grow flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="bg-red-500 text-white p-8 rounded-t-2xl">
-              <div className="flex items-center">
-                <AlertCircle size={32} className="mr-4" />
-                <h2 className="text-2xl font-bold">Authentification requise</h2>
-              </div>
-              <p className="mt-2 text-white/90">
-                Veuillez vous connecter pour accéder à cette page.
-              </p>
-            </div>
-            <div className="p-8 bg-white">
-              <p className="text-gray-600 mb-6">
-                Vous devez être connecté(e) pour voir et gérer votre équipement
-                médical. Veuillez vous connecter pour continuer.
-              </p>
-              <div className="flex flex-col space-y-4">
-                <Link
-                  to="/login2"
-                  className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
-                >
-                  <User size={18} className="mr-2" />
-                  Se connecter
-                </Link>
-                <Link
-                  to="/"
-                  className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
-                >
-                  Retour à l'accueil
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  const getStatusText = (availability) => {
+    switch (availability) {
+      case 'available':
+        return 'Disponible';
+      case 'pending':
+        return 'En attente';
+      case 'not-available':
+        return 'Non disponible';
+      default:
+        return 'Inconnu';
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header onLogout={handleLogout} />
+    <div className="flex h-screen bg-[#f0f7ff]">
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        menuItems={menuItems}
+        activeMenuItem="/my-equipment"
+        handleMenuClick={handleMenuClick}
+        handleLogout={handleLogout}
+      />
 
-      <div className="flex-grow py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#f0f7ff]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-[#084b88]">
-                Mon Équipement
-              </h1>
-              <p className="text-[#0070cc] mt-1">
-                Gérez tout votre équipement médical répertorié
-              </p>
-            </div>
+      <div className={`flex-1 ${isSidebarOpen ? "ml-64" : "ml-20"}`}>
+        <DashboardHeader
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          userData={userData}
+          handleLogout={handleLogout}
+        />
 
-            <div className="mt-4 sm:mt-0">
+        <main className="p-8">
+          <div className="bg-[#e0f0fe] shadow-sm p-6 mb-8 rounded-xl">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-[#084b88]">
+                  Mon Équipement
+                </h2>
+                <p className="text-md text-[#108de4] mt-1">
+                  Gérez vos annonces d'équipement médical
+                </p>
+              </div>
               <button
-                onClick={() => navigate("/add-equipment")}
-                className="px-4 py-2 bg-[#0070cc] hover:bg-[#0058a6] text-white rounded-md flex items-center"
+                onClick={handleAddEquipment}
+                className="bg-[#0070cc] hover:bg-[#0058a6] text-white px-4 py-2 rounded-lg flex items-center"
               >
                 <Plus size={18} className="mr-2" />
-                Ajouter un équipement
+                Ajouter Nouvel Équipement
               </button>
             </div>
-          </div>
 
-          {/* Filters and Search */}
-          <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-3 text-[#37aaf8]"
-                  size={16}
-                />
-                <input
-                  type="text"
-                  placeholder="Rechercher un équipement..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#108de4]"
-                />
+            {loading && (
+              <div className="bg-white rounded-lg p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0070cc] mx-auto"></div>
+                <p className="text-center mt-4 text-[#108de4]">Chargement de vos équipements...</p>
               </div>
+            )}
 
-              <div>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#108de4]"
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+                <p className="font-medium">Une erreur est survenue</p>
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
+            {!loading && !error && filteredEquipment.length === 0 ? (
+              <div className="text-center py-16 px-6 bg-white rounded-xl shadow-sm">
+                <div className="rounded-full p-4 bg-[#e0f0fe] text-[#0070cc] mx-auto w-20 h-20 flex items-center justify-center mb-4">
+                  <Package size={40} />
+                </div>
+                <h3 className="font-semibold text-lg text-[#084b88] mb-2">
+                  Aucun équipement trouvé
+                </h3>
+                <p className="text-[#108de4] mb-6 max-w-md mx-auto">
+                  Vous n'avez pas encore ajouté d'équipement médical. Ajoutez votre premier article pour commencer à le louer.
+                </p>
+                <button
+                  onClick={handleAddEquipment}
+                  className="bg-[#0070cc] hover:bg-[#0058a6] text-white px-6 py-3 rounded-lg flex items-center mx-auto"
                 >
-                  <option value="all">Toutes les catégories</option>
-                  <option value="Aides à la Mobilité">Aides à la Mobilité</option>
-                  <option value="Équipement Respiratoire">Équipement Respiratoire</option>
-                  <option value="Lits d'Hôpital">Lits d'Hôpital</option>
-                  <option value="Sécurité Salle de Bain">Sécurité Salle de Bain</option>
-                  <option value="Lève-Personnes">Lève-Personnes</option>
-                  <option value="Aides à la Vie Quotidienne">Aides à la Vie Quotidienne</option>
-                </select>
+                  <Plus size={20} className="mr-2" />
+                  Ajouter Votre Premier Équipement
+                </button>
               </div>
-
-              <div>
-                <select
-                  value={`${sortField}-${sortDirection}`}
-                  onChange={(e) => {
-                    const [field, direction] = e.target.value.split("-");
-                    setSortField(field);
-                    setSortDirection(direction);
-                  }}
-                  className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#108de4]"
-                >
-                  <option value="name-asc">Nom (A-Z)</option>
-                  <option value="name-desc">Nom (Z-A)</option>
-                  <option value="price-asc">Prix (Bas à Élevé)</option>
-                  <option value="price-desc">Prix (Élevé à Bas)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Error State */}
-          {error && (
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border-l-4 border-red-500">
-              <div className="flex items-center">
-                <AlertCircle className="text-red-500 mr-3" size={24} />
-                <div>
-                  <h3 className="text-lg font-medium text-red-800">Erreur lors du chargement</h3>
-                  <p className="text-red-600 mt-1">Impossible de charger votre équipement. Veuillez réessayer.</p>
+            ) : !loading && !error && (
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Équipement
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Catégorie
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Prix
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Période
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          État
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Statut
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Ville
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredEquipment.map((item) => (
+                        <tr key={item._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="h-10 w-10 flex-shrink-0">
+                                {item.image ? (
+                                  <img
+                                    className="h-10 w-10 rounded-lg object-cover"
+                                    src={`http://localhost:5000${item.image}`}
+                                    alt={item.name}
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-lg bg-[#f0f7ff] flex items-center justify-center">
+                                    <Package size={20} className="text-[#0070cc]" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.category}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{item.price} MAD</div>
+                            <div className="text-xs text-gray-500">
+                              Par {item.rentalPeriod === 'day' ? 'jour' : 
+                                  item.rentalPeriod === 'week' ? 'semaine' : 'mois'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.rentalPeriod === 'day' ? 'Jour' : 
+                             item.rentalPeriod === 'week' ? 'Semaine' : 'Mois'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.condition}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(item.availability)}`}>
+                              {getStatusText(item.availability)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {item.location}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end space-x-3">
+                              <button
+                                onClick={() => handleEditEquipment(item)}
+                                className="p-1.5 bg-[#e0f0fe] text-[#0070cc] rounded-lg hover:bg-[#0070cc] hover:text-white transition-colors"
+                                title="Modifier"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(item)}
+                                className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+                                title="Supprimer"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Loading State */}
-          {loading && (
-            <div className="bg-white rounded-xl shadow-sm p-10 text-center">
-              <div className="animate-spin w-10 h-10 border-4 border-[#0070cc] border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-[#108de4]">Chargement de votre équipement...</p>
-            </div>
-          )}
-
-          {/* Equipment List */}
-          {!loading && !error && products.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm p-10 text-center">
-              <Package className="w-16 h-16 mx-auto mb-4 text-[#7cc7fc]" />
-              <h3 className="text-xl font-medium text-[#084b88] mb-2">
-                Aucun équipement trouvé
-              </h3>
-              <p className="text-[#108de4] mb-6 max-w-md mx-auto">
-                Vous n'avez pas encore ajouté d'équipement médical ou aucun équipement ne correspond à vos filtres actuels.
-              </p>
-              <button
-                onClick={() => navigate("/add-equipment")}
-                className="px-4 py-2 bg-[#0070cc] hover:bg-[#0058a6] text-white rounded-md flex items-center justify-center mx-auto"
-              >
-                <Plus size={18} className="mr-1" />
-                Ajouter un équipement
-              </button>
-            </div>
-          ) : !loading && !error && (
-            <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Équipement
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Description
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Prix/Jour
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-[#e0f0fe]">
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
-                                alt={product.name}
-                                className="h-10 w-10 object-cover"
-                              />
-                            ) : (
-                              <div className="h-10 w-10 flex items-center justify-center text-[#7cc7fc]">
-                                <Package size={20} />
-                              </div>
-                            )}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-[#0d4071]">
-                              {product.name}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-[#108de4] line-clamp-2">
-                          {product.description}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-bold text-[#0d4071]">
-                          {product.price} MAD
-                          <span className="text-xs font-normal text-[#108de4] ml-1">
-                            /jour
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          product.availability === "available"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}>
-                          {product.availability === "available"
-                            ? "Disponible"
-                            : "Indisponible"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link
-                          to={`/edit-equipment/${product.id}`}
-                          className="text-[#0070cc] hover:text-[#0058a6] px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
-                        >
-                          Gérer
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </main>
       </div>
-
-      <Footer />
     </div>
   );
 };
 
-export default MyEquipment;
+export default MyEquipmentPage;

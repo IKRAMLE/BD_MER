@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react';
 import logo from "/caduceus.png";
 
 const Sidebar = ({ isSidebarOpen, menuItems, activeMenuItem, handleMenuClick, handleLogout }) => {
+  
   return (
     <div
       className={`bg-gradient-to-b from-[#084b88] to-[#082a4d] text-white transition-all duration-300 ${

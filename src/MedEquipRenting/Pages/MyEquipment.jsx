@@ -14,25 +14,32 @@ const MyEquipment = () => {
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Check authentication first
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("user");
-    if (user) {
-      setIsLoggedIn(true);
-      setUserData(JSON.parse(user));
-      
-      // Load initial equipment data
-      fetchEquipment();
+    try {
+      const user = localStorage.getItem("user");
+      if (user) {
+        setIsLoggedIn(true);
+        setUserData(JSON.parse(user));
+      }
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+    } finally {
+      setAuthChecked(true);
     }
-    setAuthChecked(true);
   }, []);
 
   // Fetch equipment data based on current filters
   const fetchEquipment = async () => {
+    if (!isLoggedIn) return;
+    
     setLoading(true);
+    setError(null);
+    
     try {
       // Build query parameters
       const params = new URLSearchParams();
@@ -42,7 +49,6 @@ const MyEquipment = () => {
       if (categoryFilter !== "all") params.append("category", categoryFilter);
       
       // Get user ID for filtering by owner
-      const userData = JSON.parse(localStorage.getItem("user"));
       if (userData && userData.id) {
         params.append("userId", userData.id);
       }
@@ -58,15 +64,28 @@ const MyEquipment = () => {
       setProducts(data);
     } catch (error) {
       console.error("Error fetching equipment:", error);
+      setError(error.message);
+      
       // Fallback to local storage in case API fails
-      const productsJSON = localStorage.getItem("userProducts");
-      if (productsJSON) {
-        setProducts(JSON.parse(productsJSON));
+      try {
+        const productsJSON = localStorage.getItem("userProducts");
+        if (productsJSON) {
+          setProducts(JSON.parse(productsJSON));
+        }
+      } catch (storageError) {
+        console.error("Error reading from localStorage:", storageError);
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // Fetch equipment after authentication check
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchEquipment();
+    }
+  }, [isLoggedIn]);
 
   // Refetch equipment when filters change
   useEffect(() => {
@@ -90,7 +109,7 @@ const MyEquipment = () => {
     }
   };
 
-  // Show loading state
+  // Show loading state while checking authentication
   if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff]">
@@ -102,45 +121,49 @@ const MyEquipment = () => {
   // Show authentication required message
   if (authChecked && !isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="bg-red-500 text-white p-8 rounded-t-2xl">
-            <div className="flex items-center">
-              <AlertCircle size={32} className="mr-4" />
-              <h2 className="text-2xl font-bold">Authentification requise</h2>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex items-center justify-center bg-gradient-to-b from-white to-[#f0f7ff] p-4">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-red-500 text-white p-8 rounded-t-2xl">
+              <div className="flex items-center">
+                <AlertCircle size={32} className="mr-4" />
+                <h2 className="text-2xl font-bold">Authentification requise</h2>
+              </div>
+              <p className="mt-2 text-white/90">
+                Veuillez vous connecter pour accéder à cette page.
+              </p>
             </div>
-            <p className="mt-2 text-white/90">
-              Veuillez vous connecter pour accéder à cette page.
-            </p>
-          </div>
-          <div className="p-8 bg-white">
-            <p className="text-gray-600 mb-6">
-              Vous devez être connecté(e) pour voir et gérer votre équipement
-              médical. Veuillez vous connecter pour continuer.
-            </p>
-            <div className="flex flex-col space-y-4">
-              <Link
-                to="/profile"
-                className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
-              >
-                <User size={18} className="mr-2" />
-                Se connecter
-              </Link>
-              <Link
-                to="/"
-                className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
-              >
-                Retour à l'accueil
-              </Link>
+            <div className="p-8 bg-white">
+              <p className="text-gray-600 mb-6">
+                Vous devez être connecté(e) pour voir et gérer votre équipement
+                médical. Veuillez vous connecter pour continuer.
+              </p>
+              <div className="flex flex-col space-y-4">
+                <Link
+                  to="/login2"
+                  className="inline-flex justify-center items-center px-6 py-3 bg-[#0070cc] hover:bg-[#0058a6] text-white font-medium rounded-lg transition-colors"
+                >
+                  <User size={18} className="mr-2" />
+                  Se connecter
+                </Link>
+                <Link
+                  to="/"
+                  className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-[#0070cc] font-medium rounded-lg hover:bg-[#f0f7ff] transition-colors"
+                >
+                  Retour à l'accueil
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col mt-11">
+    <div className="min-h-screen flex flex-col">
       <Header onLogout={handleLogout} />
 
       <div className="flex-grow py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#f0f7ff]">
@@ -218,6 +241,19 @@ const MyEquipment = () => {
             </div>
           </div>
 
+          {/* Error State */}
+          {error && (
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border-l-4 border-red-500">
+              <div className="flex items-center">
+                <AlertCircle className="text-red-500 mr-3" size={24} />
+                <div>
+                  <h3 className="text-lg font-medium text-red-800">Erreur lors du chargement</h3>
+                  <p className="text-red-600 mt-1">Impossible de charger votre équipement. Veuillez réessayer.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Loading State */}
           {loading && (
             <div className="bg-white rounded-xl shadow-sm p-10 text-center">
@@ -227,7 +263,7 @@ const MyEquipment = () => {
           )}
 
           {/* Equipment List */}
-          {!loading && products.length === 0 ? (
+          {!loading && !error && products.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm p-10 text-center">
               <Package className="w-16 h-16 mx-auto mb-4 text-[#7cc7fc]" />
               <h3 className="text-xl font-medium text-[#084b88] mb-2">
@@ -244,68 +280,89 @@ const MyEquipment = () => {
                 Ajouter un équipement
               </button>
             </div>
-          ) : !loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  <div className="h-48 overflow-hidden bg-[#e0f0fe]">
-                    {product.imageUrl ? (
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-[#e0f0fe] text-[#7cc7fc]">
-                        <Package size={48} />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-5">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-medium text-lg text-[#0d4071] line-clamp-1">
-                        {product.name}
-                      </h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          ) : !loading && !error && (
+            <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Équipement
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Prix/Jour
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Statut
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {products.map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-[#e0f0fe]">
+                            {product.imageUrl ? (
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                className="h-10 w-10 object-cover"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 flex items-center justify-center text-[#7cc7fc]">
+                                <Package size={20} />
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-[#0d4071]">
+                              {product.name}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-[#108de4] line-clamp-2">
+                          {product.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-bold text-[#0d4071]">
+                          {product.price} MAD
+                          <span className="text-xs font-normal text-[#108de4] ml-1">
+                            /jour
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           product.availability === "available"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {product.availability === "available"
-                          ? "Disponible"
-                          : "Indisponible"}
-                      </span>
-                    </div>
-
-                    <p className="text-[#108de4] text-sm mb-3 line-clamp-2">
-                      {product.description}
-                    </p>
-
-                    <div className="mt-2 flex items-center justify-between">
-                      <div className="text-[#0d4071] font-bold">
-                        {product.price} MAD
-                        <span className="text-xs font-normal text-[#108de4]">
-                          /jour
+                        }`}>
+                          {product.availability === "available"
+                            ? "Disponible"
+                            : "Indisponible"}
                         </span>
-                      </div>
-
-                      <div className="flex space-x-2">
-                        <Link to={`/edit-equipment/${product.id}`}>
-                          <button className="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                            Gérer
-                          </button>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Link
+                          to={`/edit-equipment/${product.id}`}
+                          className="text-[#0070cc] hover:text-[#0058a6] px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          Gérer
                         </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

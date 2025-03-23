@@ -14,11 +14,11 @@ import AuthGuard from "./MedEquipRenting/Components/AuthGuard";
 
 
 
+
 const App = () => {
   return (
     <Router>
       <Routes>
-      
 
         {/* Route for Medical Equipment Renting and its login */}
         <Route path="/" element={<MedicalEquipment />} />

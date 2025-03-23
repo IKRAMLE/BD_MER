@@ -10,12 +10,6 @@ function RentEquip() {
   const [error, setError] = useState(null);
   const [filteredEquipment, setFilteredEquipment] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [filters, setFilters] = useState({
-    category: '',
-    priceRange: { min: 0, max: 10000 },
-    availability: '',
-    condition: ''
-  });
 
   // Fetch equipment data from backend
   useEffect(() => {
@@ -89,27 +83,53 @@ function RentEquip() {
     // Save to localStorage
     localStorage.setItem('cart', JSON.stringify(newCart));
     
-    // Update cart count in header by dispatching an event
+    // Update cart count in header
     window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart.length }));
   };
 
   // Handle filter changes from sidebar
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-    let filtered = equipment;
-    if (newFilters.category) {
-      filtered = filtered.filter(item => item.category === newFilters.category);
+  const handleFilterChange = (filters) => {
+    let filtered = [...equipment];
+
+    // Filter by category
+    if (filters.category) {
+      filtered = filtered.filter(item => item.category === filters.category);
     }
+
+    // Filter by price range
     filtered = filtered.filter(item => 
-      item.price >= newFilters.priceRange.min && 
-      item.price <= newFilters.priceRange.max
+      item.price >= filters.priceRange.min && 
+      item.price <= filters.priceRange.max
     );
-    if (newFilters.availability) {
-      filtered = filtered.filter(item => item.availability === newFilters.availability);
+
+    // Filter by availability
+    if (filters.availability) {
+      filtered = filtered.filter(item => item.availability === filters.availability);
     }
-    if (newFilters.condition) {
-      filtered = filtered.filter(item => item.condition === newFilters.condition);
+
+    // Filter by condition
+    if (filters.condition) {
+      filtered = filtered.filter(item => item.condition === filters.condition);
     }
+
+    // Sort items
+    if (filters.sortBy) {
+      filtered.sort((a, b) => {
+        switch (filters.sortBy) {
+          case 'price-asc':
+            return a.price - b.price;
+          case 'price-desc':
+            return b.price - a.price;
+          case 'name-asc':
+            return a.name.localeCompare(b.name);
+          case 'name-desc':
+            return b.name.localeCompare(a.name);
+          default:
+            return 0;
+        }
+      });
+    }
+
     setFilteredEquipment(filtered);
   };
 

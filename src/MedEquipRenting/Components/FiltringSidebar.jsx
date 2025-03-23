@@ -1,21 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../utils/axiosConfig";
 
 function FilteringSidebar({ onFilterChange }) {
   const [category, setCategory] = useState("");
-  const [priceRange, setPriceRange] = useState(500);
-  const [rentalDuration, setRentalDuration] = useState("");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [availability, setAvailability] = useState("");
   const [condition, setCondition] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [maxPrice, setMaxPrice] = useState(1000);
+
+  // Fetch categories and max price from API
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const response = await axiosInstance.get('/equipment');
+        const equipment = response.data.data;
+        
+        // Extract unique categories
+        const uniqueCategories = [...new Set(equipment.map(item => item.category))];
+        setCategories(uniqueCategories);
+        
+        // Find max price
+        const highestPrice = Math.max(...equipment.map(item => item.price));
+        setMaxPrice(Math.ceil(highestPrice / 100) * 100); // Round up to nearest hundred
+        setPriceRange({ min: 0, max: highestPrice });
+      } catch (error) {
+        console.error('Error fetching filters:', error);
+      }
+    };
+    
+    fetchFilters();
+  }, []);
 
   // Function to handle filter changes
   const handleFilterChange = () => {
     onFilterChange({
       category,
       priceRange,
-      rentalDuration,
+      availability,
       condition,
       sortBy,
     });
+  };
+
+  // Handle price range changes
+  const handlePriceChange = (value) => {
+    setPriceRange(prev => ({ ...prev, max: parseInt(value) }));
   };
 
   return (
@@ -35,51 +66,46 @@ function FilteringSidebar({ onFilterChange }) {
             className="w-full border rounded p-2 focus:ring-2 bg-white border-[#e5e3e0] text-[#2c3e50] focus:outline-[#3498db]"
           >
             <option value="">Toutes les Catégories</option>
-            <option value="Aides à la Mobilité">Aides à la Mobilité</option>
-            <option value="Équipement Respiratoire">Équipement Respiratoire</option>
-            <option value="Lits d'Hôpital">Lits d'Hôpital</option>
-            <option value="Sécurité Salle de Bain">Sécurité Salle de Bain</option>
-            <option value="Lève-Personnes">Lève-Personnes</option>
-            <option value="Aides à la Vie Quotidienne">Aides à la Vie Quotidienne</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
         </div>
 
         {/* Price Range Filter */}
         <div className="mb-4">
           <label htmlFor="priceRange" className="block mb-2 text-sm text-[#7d8a96]">
-            Fourchette de Prix
+            Prix Maximum
           </label>
           <input
             type="range"
             id="priceRange"
             min="0"
-            max="500"
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
+            max={maxPrice}
+            value={priceRange.max}
+            onChange={(e) => handlePriceChange(e.target.value)}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[#e5e3e0]"
           />
           <div className="flex justify-between text-xs mt-1 text-[#95a5a6]">
-            <span>0 MAD</span>
-            <span>{priceRange} MAD</span>
+            <span>0 DH</span>
+            <span>{priceRange.max} DH</span>
           </div>
         </div>
 
-        {/* Rental Duration Filter */}
+        {/* Availability Filter */}
         <div className="mb-4">
-          <label htmlFor="rentalDuration" className="block mb-2 text-sm text-[#7d8a96]">
-            Durée de Location
+          <label htmlFor="availability" className="block mb-2 text-sm text-[#7d8a96]">
+            Disponibilité
           </label>
           <select
-            id="rentalDuration"
-            value={rentalDuration}
-            onChange={(e) => setRentalDuration(e.target.value)}
+            id="availability"
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value)}
             className="w-full border rounded p-2 focus:ring-2 bg-white border-[#e5e3e0] text-[#2c3e50] focus:outline-[#3498db]"
           >
-            <option value="">Toutes</option>
-            <option value="Jour">Jour</option>
-            <option value="Semaine">Semaine</option>
-            <option value="Mois">Mois</option>
-            <option value="Long Terme">Long Terme</option>
+            <option value="">Tous</option>
+            <option value="available">Disponible</option>
+            <option value="unavailable">Non Disponible</option>
           </select>
         </div>
 
@@ -95,10 +121,10 @@ function FilteringSidebar({ onFilterChange }) {
             className="w-full border rounded p-2 focus:ring-2 bg-white border-[#e5e3e0] text-[#2c3e50] focus:outline-[#3498db]"
           >
             <option value="">Tous les États</option>
-            <option value="Neuf">Neuf</option>
-            <option value="Comme Neuf">Comme Neuf</option>
-            <option value="Excellent">Excellent</option>
-            <option value="Bon">Bon</option>
+            <option value="new">Neuf</option>
+            <option value="like-new">Comme Neuf</option>
+            <option value="excellent">Excellent</option>
+            <option value="good">Bon</option>
           </select>
         </div>
 
@@ -113,10 +139,11 @@ function FilteringSidebar({ onFilterChange }) {
             onChange={(e) => setSortBy(e.target.value)}
             className="w-full border rounded p-2 focus:ring-2 bg-white border-[#e5e3e0] text-[#2c3e50] focus:outline-[#3498db]"
           >
-            <option value="asc">Prix: Croissant</option>
-            <option value="desc">Prix: Décroissant</option>
-            <option value="az">A-Z</option>
-            <option value="za">Z-A</option>
+            <option value="">Par défaut</option>
+            <option value="price-asc">Prix: Croissant</option>
+            <option value="price-desc">Prix: Décroissant</option>
+            <option value="name-asc">Nom: A-Z</option>
+            <option value="name-desc">Nom: Z-A</option>
           </select>
         </div>
 

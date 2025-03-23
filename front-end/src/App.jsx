@@ -12,6 +12,7 @@ import Settings from "./MedEquipRenting/Pages/Settings";
 import AuthGuard from "./MedEquipRenting/Components/AuthGuard";
 import EquipmentDetails from "./MedEquipRenting/Pages/EquipmentDetails";
 import Favoris from "./MedEquipRenting/Pages/Favoris";
+import Checkout from './MedEquipRenting/Pages/Checkout';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/rent-equip" element={<RentEquip />} /> 
         <Route path="/equipment/:id" element={<EquipmentDetails />} />
+        <Route path="/checkout" element={<Checkout />} />
 
         {/* Protected routes */}
         <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />

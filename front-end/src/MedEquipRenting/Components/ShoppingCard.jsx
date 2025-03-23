@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { X, ShoppingBag, Trash2, CreditCard, ArrowRight, Heart, Gift } from "lucide-react";
 
 const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateCartItemQuantity }) => {
   const [animateItems, setAnimateItems] = useState(false);
+  const navigate = useNavigate();
   
   const isEmpty = cartItems.length === 0;
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.days * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.price  * item.quantity), 0);
   };
   
   // Handle item removal with fallback if no function is provided
@@ -34,6 +36,11 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
       setAnimateItems(false);
     }
   }, [isOpen]);
+  
+  const handleCheckout = () => {
+    onClose();
+    navigate('/checkout');
+  };
   
   if (!isOpen) return null;
   
@@ -118,7 +125,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                         </button>
                       </div>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <span>{item.price} DH / jour × {item.days} jours</span>
+                        <span>{item.price} DH / jour </span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center bg-white rounded-full border border-gray-200">
@@ -136,7 +143,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                             +
                           </button>
                         </div>
-                        <span className="font-medium text-blue-600">{item.price * item.days * item.quantity} DH</span>
+                        <span className="font-medium text-blue-600">{item.price * item.quantity} DH</span>
                       </div>
                     </div>
                   </div>
@@ -159,7 +166,10 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                 </div>
                 
                 {/* Checkout button */}
-                <button className="mt-4 w-full py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center group">
+                <button 
+                  onClick={handleCheckout}
+                  className="mt-4 w-full py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center justify-center group"
+                >
                   <CreditCard size={18} className="mr-2 group-hover:animate-pulse" />
                   Valider ma commande
                 </button>

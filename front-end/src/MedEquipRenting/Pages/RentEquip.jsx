@@ -11,7 +11,7 @@ function RentEquip() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredEquipment, setFilteredEquipment] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(new Set());
 
   // Fetch equipment data from backend
   useEffect(() => {
@@ -30,29 +30,37 @@ function RentEquip() {
     };
 
     fetchEquipment();
+    fetchFavorites();
   }, []);
 
-  // Load favorites from localStorage on mount
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
+  // Fetch favorites from backend
+  const fetchFavorites = async () => {
+    try {
+      const response = await axiosInstance.get('/favorites');
+      const favoriteIds = new Set(response.data.data.map(item => item._id));
+      setFavorites(favoriteIds);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
     }
-  }, []);
+  };
 
-  // Save favorites to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
-
-  const toggleFavorite = (itemId) => {
-    setFavorites(prevFavorites => {
-      if (prevFavorites.includes(itemId)) {
-        return prevFavorites.filter(id => id !== itemId);
+  const toggleFavorite = async (e, itemId) => {
+    e.stopPropagation();
+    try {
+      if (favorites.has(itemId)) {
+        await axiosInstance.delete(`/favorites/${itemId}`);
+        setFavorites(prev => {
+          const newFavorites = new Set(prev);
+          newFavorites.delete(itemId);
+          return newFavorites;
+        });
       } else {
-        return [...prevFavorites, itemId];
+        await axiosInstance.post(`/favorites/${itemId}`);
+        setFavorites(prev => new Set([...prev, itemId]));
       }
-    });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   };
 
   const addToCart = (item) => {
@@ -186,16 +194,13 @@ function RentEquip() {
                         </div>
                       )}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite(item._id);
-                        }}
+                        onClick={(e) => toggleFavorite(e, item._id)}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
                       >
                         <Heart
                           size={20}
                           className={`${
-                            favorites.includes(item._id)
+                            favorites.has(item._id)
                               ? "fill-red-500 text-red-500"
                               : "text-gray-400"
                           }`}

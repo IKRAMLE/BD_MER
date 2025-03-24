@@ -87,7 +87,7 @@ const HowItWorks = () => {
                 key={step.id}
                 className={`glass-card p-6 rounded-xl transition-all duration-500 ${
                   activeStep === step.id 
-                    ? 'border-l-4 border-l-medical-500 scale-105 shadow-lg' 
+                    ? 'border-l-4 border-l-[#108de4] scale-105 shadow-lg' 
                     : 'opacity-75 hover:opacity-100'
                 }`}
                 onClick={() => setActiveStep(step.id)}
@@ -108,9 +108,9 @@ const HowItWorks = () => {
           </div>
 
           {/* Illustration */}
-          <div className={`relative transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 translate-x-12'}`}>
+          <div className={`relative transition-all duration-600 ${isVisible ? 'opacity-100' : 'opacity-0 translate-x-12'}`}>
             <div className="aspect-square max-w-md mx-auto relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-medical-100/80 to-medical-200/50 rounded-full blur-3xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#e0f0fe]/80 to-[#bae0fd]/50 rounded-full blur-3xl"></div>
               <div className="relative z-10 h-full rounded-3xl glass-card p-6 flex items-center justify-center">
                 <img
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"

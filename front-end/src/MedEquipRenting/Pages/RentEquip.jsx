@@ -30,7 +30,12 @@ function RentEquip() {
     };
 
     fetchEquipment();
-    fetchFavorites();
+    
+    // Only fetch favorites if user is authenticated
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      fetchFavorites();
+    }
   }, []);
 
   // Fetch favorites from backend
@@ -43,7 +48,9 @@ function RentEquip() {
         .map(item => item._id));
       setFavorites(favoriteIds);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+      if (error.response?.status !== 401) {
+        console.error('Error fetching favorites:', error);
+      }
     }
   };
 
@@ -54,7 +61,7 @@ function RentEquip() {
     // Check if user is authenticated
     const token = localStorage.getItem('authToken');
     if (!token) {
-      navigate('/login');
+      navigate('/login2');
       return;
     }
     
@@ -74,7 +81,7 @@ function RentEquip() {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        navigate('/login');
+        navigate('/login2');
       } else {
         console.error('Error toggling favorite:', error);
       }

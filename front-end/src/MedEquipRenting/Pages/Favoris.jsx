@@ -21,17 +21,15 @@ const Favoris = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.get('/favorites');
-      const favoritesData = response.data.data;
-      
-      // Extract unique categories
-      const uniqueCategories = [...new Set(favoritesData.map(item => item.category))];
+      // Filter out any null equipment and extract valid categories
+      const validFavorites = response.data.data.filter(item => item && item.category);
+      const uniqueCategories = [...new Set(validFavorites.map(item => item.category))];
       setCategories(['all', ...uniqueCategories]);
-      
-      setFavorites(favoritesData);
+      setFavorites(validFavorites);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching favorites:', error);
       setError('Impossible de charger les favoris');
-    } finally {
       setLoading(false);
     }
   };
@@ -50,140 +48,103 @@ const Favoris = () => {
     navigate(`/equipment/${item._id}`);
   };
 
-  // Filter and search logic
   const filteredFavorites = favorites.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || item.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) {
-    return (
-      <div className="p-4">
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0070cc]"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4">
-        <div className="bg-white rounded-xl p-4 shadow-md">
-          <div className="flex items-center justify-center text-[#0070cc]">
-            <AlertCircle className="h-8 w-8" />
-          </div>
-          <p className="text-center mt-2 text-[#084b88]">{error}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-4">
-      <div className="bg-white rounded-xl shadow-md p-4">
-        <h2 className="text-xl font-bold text-[#084b88] mb-4">
-          Mes Favoris
-        </h2>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Mes Favoris</h1>
 
-        {/* Search and Filter */}
-        <div className="space-y-3 mb-4">
+      {/* Search and Filter Section */}
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Rechercher un équipement..."
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        {categories.length > 1 && (
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7cc7fc] h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#bae0fd] focus:outline-none focus:ring-2 focus:ring-[#0070cc] bg-[#f0f7ff] text-sm"
-            />
-          </div>
-
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7cc7fc] h-4 w-4" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <select
+              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-[#bae0fd] focus:outline-none focus:ring-2 focus:ring-[#0070cc] bg-[#f0f7ff] appearance-none cursor-pointer text-sm"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  {category === 'all' ? 'Toutes les catégories' : category}
                 </option>
               ))}
             </select>
           </div>
-        </div>
-
-        {/* Favorites List */}
-        <div className="space-y-3">
-          {filteredFavorites.length === 0 ? (
-            <div className="text-center py-6 text-[#7d7469]">
-              {searchTerm || filterCategory !== 'all' 
-                ? 'Aucun favori ne correspond à vos critères'
-                : 'Aucun favori pour le moment'}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <AnimatePresence>
-                {filteredFavorites.map((item) => (
-                  <motion.div
-                    key={item._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    onClick={() => handleViewDetails(item)}
-                    className="bg-[#f0f7ff] rounded-lg p-3 flex items-center space-x-3 hover:shadow-md transition-shadow cursor-pointer"
-                  >
-                    <img
-                      src={item.image ? `http://localhost:5000${item.image}` : '/placeholder.jpg'}
-                      alt={item.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/placeholder.jpg';
-                      }}
-                    />
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-medium text-[#084b88] truncate pr-2">
-                          {item.name}
-                        </h3>
-                        <button
-                          onClick={(e) => removeFavorite(e, item._id)}
-                          className="text-red-500 hover:text-red-600 transition-colors p-1"
-                        >
-                          <Heart className="h-4 w-4 fill-current" />
-                        </button>
-                      </div>
-                      
-                      <p className="text-[#4e4942] text-xs line-clamp-1 mb-1">
-                        {item.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#0070cc] font-medium">
-                          {item.price} DH
-                        </span>
-                        <span className={`text-xs ${
-                          item.availability === 'available' 
-                            ? 'text-[#059669]' 
-                            : 'text-[#dc2626]'
-                        }`}>
-                          {item.availability === 'available' ? 'Disponible' : 'Non disponible'}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
+        )}
       </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-64 text-red-500">
+          <AlertCircle className="mr-2" />
+          <span>{error}</span>
+        </div>
+      ) : filteredFavorites.length === 0 ? (
+        <div className="text-center py-12">
+          <Heart className="mx-auto text-gray-400 mb-4" size={48} />
+          <p className="text-gray-500">Aucun favori trouvé</p>
+        </div>
+      ) : (
+        <AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredFavorites.map(item => (
+              <motion.div
+                key={item._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div 
+                  className="relative h-48 cursor-pointer"
+                  onClick={() => handleViewDetails(item)}
+                >
+                  {item.image ? (
+                    <img
+                      src={`http://localhost:5000${item.image}`}
+                      alt={item.name}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <span className="text-gray-400">No image</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={(e) => removeFavorite(e, item._id)}
+                    className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
+                  >
+                    <Heart className="text-red-500 fill-red-500" size={20} />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.name}</h3>
+                  <p className="text-gray-600 mb-2">{item.category}</p>
+                  <p className="text-blue-600 font-semibold">{item.price}€/jour</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </AnimatePresence>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Compass, TrendingUp, User, Heart, Package, Settings } from "lucide-react";
+import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList } from "lucide-react";
 import logo from "/caduceus.png";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
@@ -110,9 +110,10 @@ const Dashboard = () => {
   const menuItems = [
     { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
     { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
-    { icon: TrendingUp, text: "Analytiques", path: "/analytics" },
-    { icon: User, text: "Profil", path: "/profile" },
+    { icon: ClipboardList, text: "Demandes", path: "/requests" },
+    { icon: MessageSquare, text: "Messages", path: "/chat" },
     { icon: Heart, text: "Favoris", path: "/favorites" },
+    { icon: User, text: "Profil", path: "/profile" },
     { icon: Settings, text: "Paramètres", path: "/settings" },
   ];
 

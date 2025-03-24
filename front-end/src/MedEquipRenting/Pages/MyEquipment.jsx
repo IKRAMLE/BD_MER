@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Package, Edit, Trash2, Plus, Compass, TrendingUp, User, Heart, Settings } from "lucide-react";
+import { Package, Edit, Trash2, Plus, Compass, User, Heart, Settings, MessageSquare, ClipboardList } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
 
-const API_URL = 'http://localhost:5000'; // Add base URL for images
+const API_URL = 'http://localhost:5000'; 
 
 const MyEquipmentPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -19,11 +19,13 @@ const MyEquipmentPage = () => {
   const menuItems = [
     { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
     { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
-    { icon: TrendingUp, text: "Analytiques", path: "/analytics" },
-    { icon: User, text: "Profil", path: "/profile" },
+    { icon: ClipboardList, text: "Demandes", path: "/requests" },
+    { icon: MessageSquare, text: "Messages", path: "/chat" },
     { icon: Heart, text: "Favoris", path: "/favorites" },
+    { icon: User, text: "Profil", path: "/profile" },
     { icon: Settings, text: "Paramètres", path: "/settings" },
   ];
+
 
   useEffect(() => {
     // Check if user is logged in

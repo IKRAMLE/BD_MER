@@ -14,6 +14,7 @@ import EquipmentDetails from "./MedEquipRenting/Pages/EquipmentDetails";
 import Favoris from "./MedEquipRenting/Pages/Favoris";
 import Checkout from './MedEquipRenting/Pages/Checkout';
 
+
 const App = () => {
   return (
     <Router>
@@ -27,12 +28,16 @@ const App = () => {
         <Route path="/equipment/:id" element={<EquipmentDetails />} />
         <Route path="/checkout" element={<Checkout />} />
 
-        {/* Protected routes */}
-        <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
-        <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
-        <Route path="/my-equipment" element={<AuthGuard><MyEquipment /></AuthGuard>} />
-        <Route path="/settings" element={<AuthGuard><Settings /></AuthGuard>} />
-        <Route path="/favorites" element={<AuthGuard><Favoris /></AuthGuard>} />
+        {/* Protected routes with Layout */}
+        <Route >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/my-equipment" element={<MyEquipment />} />
+          <Route path="/requests" element={<div>Requests Page</div>} />
+          <Route path="/chat" element={<div>Chat Page</div>} />
+          <Route path="/favorites" element={<Favoris />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Routes>
     </Router>
   );

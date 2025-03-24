@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:5000/api';
 // Create axios instance with base URL
 const axiosInstance = axios.create({
   baseURL: API_URL,
+  withCredentials: true
 });
 
 // Add request interceptor to add auth token
@@ -24,12 +25,20 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor to handle auth errors
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      // Clear auth data and redirect to login
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login2';
+  async (error) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Clear auth data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        
+        // Redirect to login if not already there
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+      // Return the error response for handling by the component
+      return Promise.reject(error);
     }
     return Promise.reject(error);
   }

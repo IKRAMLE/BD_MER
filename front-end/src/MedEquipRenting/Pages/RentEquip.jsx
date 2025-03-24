@@ -37,29 +37,47 @@ function RentEquip() {
   const fetchFavorites = async () => {
     try {
       const response = await axiosInstance.get('/favorites');
-      const favoriteIds = new Set(response.data.data.map(item => item._id));
+      // Create a Set of equipment IDs from the favorites data
+      const favoriteIds = new Set(response.data.data
+        .filter(item => item && item._id) // Filter out null/invalid items
+        .map(item => item._id));
       setFavorites(favoriteIds);
     } catch (error) {
       console.error('Error fetching favorites:', error);
     }
   };
 
-  const toggleFavorite = async (e, itemId) => {
+  const toggleFavorite = async (e, item) => {
     e.stopPropagation();
+    if (!item || !item._id) return; // Guard against invalid items
+    
+    // Check if user is authenticated
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
     try {
-      if (favorites.has(itemId)) {
-        await axiosInstance.delete(`/favorites/${itemId}`);
+      if (favorites.has(item._id)) {
+        await axiosInstance.delete(`/favorites/${item._id}`);
         setFavorites(prev => {
           const newFavorites = new Set(prev);
-          newFavorites.delete(itemId);
+          newFavorites.delete(item._id);
           return newFavorites;
         });
       } else {
-        await axiosInstance.post(`/favorites/${itemId}`);
-        setFavorites(prev => new Set([...prev, itemId]));
+        const response = await axiosInstance.post(`/favorites/${item._id}`);
+        if (response.data.success) {
+          setFavorites(prev => new Set([...prev, item._id]));
+        }
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      if (error.response && error.response.status === 401) {
+        navigate('/login');
+      } else {
+        console.error('Error toggling favorite:', error);
+      }
     }
   };
 
@@ -194,16 +212,12 @@ function RentEquip() {
                         </div>
                       )}
                       <button
-                        onClick={(e) => toggleFavorite(e, item._id)}
+                        onClick={(e) => toggleFavorite(e, item)}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
                       >
                         <Heart
                           size={20}
-                          className={`${
-                            favorites.has(item._id)
-                              ? "fill-red-500 text-red-500"
-                              : "text-gray-400"
-                          }`}
+                          className={`${favorites.has(item._id) ? 'fill-red-500 stroke-red-500' : 'stroke-gray-500'}`}
                         />
                       </button>
                     </div>
@@ -219,7 +233,7 @@ function RentEquip() {
                       
                       <div className="flex justify-between items-center mb-3">
                         <span className="text-blue-600 font-bold">
-                        {item.price} DH/{item.rentalPeriod}
+                          {item.price} DH/{item.rentalPeriod}
                         </span>
                         <span className={`px-2 py-1 text-xs rounded ${
                           item.availability === 'available' 

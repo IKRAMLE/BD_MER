@@ -21,15 +21,33 @@ const Favoris = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.get('/favorites');
-      // Filter out any null equipment and extract valid categories
-      const validFavorites = response.data.data.filter(item => item && item.category);
-      const uniqueCategories = [...new Set(validFavorites.map(item => item.category))];
+      
+      // Extract equipment data from favorites
+      const favoriteEquipment = response.data.data
+        .filter(fav => fav && fav.equipment)
+        .map(fav => fav.equipment);
+      
+      // Extract unique categories
+      const uniqueCategories = [...new Set(
+        favoriteEquipment
+          .filter(item => item && item.category)
+          .map(item => item.category)
+      )];
+      
       setCategories(['all', ...uniqueCategories]);
-      setFavorites(validFavorites);
+      setFavorites(favoriteEquipment);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching favorites:', error);
-      setError('Impossible de charger les favoris');
+      
+      if (error.response?.status === 401) {
+        // Handle unauthorized access
+        localStorage.removeItem('authToken');
+        navigate('/login2');
+      } else {
+        setError('Impossible de charger les favoris');
+      }
+      
       setLoading(false);
     }
   };
@@ -41,6 +59,12 @@ const Favoris = () => {
       setFavorites(prev => prev.filter(item => item._id !== equipmentId));
     } catch (error) {
       console.error('Error removing favorite:', error);
+      
+      if (error.response?.status === 401) {
+        // Handle unauthorized access
+        localStorage.removeItem('authToken');
+        navigate('/login2');
+      }
     }
   };
 
@@ -131,6 +155,7 @@ const Favoris = () => {
                   <button
                     onClick={(e) => removeFavorite(e, item._id)}
                     className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
+                    aria-label="Remove from favorites"
                   >
                     <Heart className="text-red-500 fill-red-500" size={20} />
                   </button>

@@ -12,6 +12,7 @@ function RentEquip() {
   const [error, setError] = useState(null);
   const [filteredEquipment, setFilteredEquipment] = useState([]);
   const [favorites, setFavorites] = useState(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
 
   // Fetch equipment data from backend
   useEffect(() => {
@@ -32,23 +33,31 @@ function RentEquip() {
     fetchEquipment();
     
     // Only fetch favorites if user is authenticated
-    const token = localStorage.getItem('authToken');
-    if (token) {
+    if (isAuthenticated) {
       fetchFavorites();
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Fetch favorites from backend
   const fetchFavorites = async () => {
     try {
       const response = await axiosInstance.get('/favorites');
-      // Create a Set of equipment IDs from the favorites data
-      const favoriteIds = new Set(response.data.data
-        .filter(item => item && item._id) // Filter out null/invalid items
-        .map(item => item._id));
+      
+      // Extract equipment IDs from the favorites data
+      // The API returns favorites with populated equipment objects
+      const favoriteIds = new Set(
+        response.data.data
+          .filter(fav => fav && fav.equipment && fav.equipment._id)
+          .map(fav => fav.equipment._id)
+      );
+      
       setFavorites(favoriteIds);
     } catch (error) {
-      if (error.response?.status !== 401) {
+      if (error.response?.status === 401) {
+        // Handle unauthorized access
+        setIsAuthenticated(false);
+        localStorage.removeItem('authToken');
+      } else {
         console.error('Error fetching favorites:', error);
       }
     }
@@ -59,14 +68,14 @@ function RentEquip() {
     if (!item || !item._id) return; // Guard against invalid items
     
     // Check if user is authenticated
-    const token = localStorage.getItem('authToken');
-    if (!token) {
+    if (!isAuthenticated) {
       navigate('/login2');
       return;
     }
     
     try {
       if (favorites.has(item._id)) {
+        // Remove from favorites
         await axiosInstance.delete(`/favorites/${item._id}`);
         setFavorites(prev => {
           const newFavorites = new Set(prev);
@@ -74,6 +83,7 @@ function RentEquip() {
           return newFavorites;
         });
       } else {
+        // Add to favorites
         const response = await axiosInstance.post(`/favorites/${item._id}`);
         if (response.data.success) {
           setFavorites(prev => new Set([...prev, item._id]));
@@ -81,6 +91,8 @@ function RentEquip() {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
+        setIsAuthenticated(false);
+        localStorage.removeItem('authToken');
         navigate('/login2');
       } else {
         console.error('Error toggling favorite:', error);
@@ -221,6 +233,7 @@ function RentEquip() {
                       <button
                         onClick={(e) => toggleFavorite(e, item)}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
+                        aria-label={favorites.has(item._id) ? "Remove from favorites" : "Add to favorites"}
                       >
                         <Heart
                           size={20}

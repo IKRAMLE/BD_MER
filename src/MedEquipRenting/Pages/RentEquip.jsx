@@ -67,12 +67,6 @@ function RentEquip() {
     e.stopPropagation();
     if (!item || !item._id) return; // Guard against invalid items
     
-    // Check if user is authenticated
-    if (!isAuthenticated) {
-      navigate('/login2');
-      return;
-    }
-    
     try {
       if (favorites.has(item._id)) {
         // Remove from favorites
@@ -231,13 +225,20 @@ function RentEquip() {
                         </div>
                       )}
                       <button
-                        onClick={(e) => toggleFavorite(e, item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isAuthenticated) {
+                            navigate('/login2');
+                            return;
+                          }
+                          toggleFavorite(e, item);
+                        }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
                         aria-label={favorites.has(item._id) ? "Remove from favorites" : "Add to favorites"}
                       >
                         <Heart
                           size={20}
-                          className={`${favorites.has(item._id) ? 'fill-red-500 stroke-red-500' : 'stroke-gray-500'}`}
+                          className={`${isAuthenticated && favorites.has(item._id) ? 'fill-red-500 stroke-red-500' : 'stroke-gray-500'}`}
                         />
                       </button>
                     </div>

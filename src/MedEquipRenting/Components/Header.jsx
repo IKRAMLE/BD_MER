@@ -168,12 +168,12 @@ const Navbar = () => {
               >
                 Louer un équipement
               </Link>
-              <Link
-                to="#contact-us"
+              <a
+               href="#contact-us"
                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
                 Contact
-              </Link>
+              </a>
             </nav>
 
             {/* Right Side Icons */}

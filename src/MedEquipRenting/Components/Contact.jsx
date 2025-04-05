@@ -69,10 +69,10 @@ const ContactUs = () => {
   };
 
   return (
-    <section id="contact-us" className="py-24 bg-gradient-to-b from-[#f0f7ff] to-[#ffffff] -mt-16">
+    <section className="py-24 bg-gradient-to-b from-[#f0f7ff] to-[#ffffff] -mt-16">
       <div className="container-custom">
         <div className="text-center mb-16">
-          <h2 className="heading-lg mb-4">Contactez-nous</h2>
+          <h2 className="heading-lg mb-4" id="contact-us">Contactez-nous</h2>
           <p className="max-w-2xl mx-auto text-[#0058a6]">
             Vous avez des questions ou souhaitez en savoir plus sur MediShare Maroc ? Contactez notre équipe et nous serons heureux de vous aider.
           </p>

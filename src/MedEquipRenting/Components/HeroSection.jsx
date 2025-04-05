@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronRight, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -75,16 +76,20 @@ const HeroSection = () => {
               isLoaded ? "opacity-100" : "opacity-0 -translate-y-4"
             }`}
           >
-            <button className="button-primary group flex items-center px-6 py-3 bg-[#108de4] text-white rounded-full font-semibold hover:bg-[#0070cc] transition-all">
-              <span>Parcourir l'équipement</span>
-              <ChevronRight
-                size={16}
-                className="ml-2 transition-transform group-hover:translate-x-1"
-              />
-            </button>
+          <Link to="/rent-equip">
+              <button className="button-primary group flex items-center px-6 py-3 bg-[#108de4] text-white rounded-full font-semibold hover:bg-[#0070cc] transition-all">
+                <span>Parcourir l'équipement</span>
+                <ChevronRight
+                  size={16}
+                  className="ml-2 transition-transform group-hover:translate-x-1"
+                />
+              </button>
+          </Link>
+          <a href="#how-it-works">
             <button className="button-secondary flex items-center px-6 py-3 bg-[#f0f7ff] text-[#108de4] border border-[#e0f0fe] rounded-full font-semibold hover:bg-[#e0f0fe] transition-all">
               <span>Comment ça marche</span>
             </button>
+          </a>
           </div>
 
           <div

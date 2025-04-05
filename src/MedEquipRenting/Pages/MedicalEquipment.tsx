@@ -7,6 +7,7 @@ import HowItWork from '../Components/HowItWork'
 import FAQ from '../Components/FAQ'
 import ContactUs from '../Components/Contact'
 import Footer from '../Components/Footer'
+import ChatBot from  '../Components/ChatBot'
 
 
 function MedicalEquipment() {
@@ -19,6 +20,7 @@ function MedicalEquipment() {
     <HowItWork /> 
     <FAQ />
     <ContactUs />
+    <ChatBot />
     <Footer /> 
     </>
   )

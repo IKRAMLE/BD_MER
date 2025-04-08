@@ -13,6 +13,10 @@ import AuthGuard from "./MedEquipRenting/Components/AuthGuard";
 import EquipmentDetails from "./MedEquipRenting/Pages/EquipmentDetails";
 import Favoris from "./MedEquipRenting/Pages/Favoris";
 import Checkout from './MedEquipRenting/Pages/Checkout';
+import AdminDashboard from "./MedEquipRenting/Pages/admin/Dashboard";
+import AdminUsers from "./MedEquipRenting/Pages/admin/Users";
+import AdminEquipment from "./MedEquipRenting/Pages/admin/AdminEquipment";
+import AdminSettings from "./MedEquipRenting/Pages/admin/Settings";
 
 
 const App = () => {
@@ -37,6 +41,13 @@ const App = () => {
           <Route path="/favorites" element={<Favoris />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
+
+            {/*Admin */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/equipment" element={<AdminEquipment />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+
         </Route>
       </Routes>
     </Router>

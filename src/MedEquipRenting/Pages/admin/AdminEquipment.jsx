@@ -222,7 +222,7 @@ const Equipment = () => {
           </div>
         </div>
 
-        {/* Equipment Cards */}
+        {/* Equipment Table */}
         <div className="bg-white border rounded shadow">
           <div className="border-b px-4 py-3 flex justify-between items-center bg-gray-50">
             <h2 className="text-lg font-semibold">Equipment</h2>
@@ -231,61 +231,88 @@ const Equipment = () => {
             </span>
           </div>
 
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredEquipment.map((item) => (
-              <div key={item._id} className="border rounded shadow-sm overflow-hidden bg-white">
-                <div className="relative h-48 bg-gray-100">
-                  <img 
-                    src={item.image ? `http://localhost:5000${item.image}` : "https://via.placeholder.com/300"} 
-                    alt={item.name} 
-                    className="w-full h-full object-fit-contain " 
-                  />
-                  <div className="absolute top-2 right-2">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        item.availability === "available"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {item.availability === "available" ? "Available" : "Not Available"}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold">{item.name}</h3>
-                  <div className="text-sm text-gray-500">
-                    {item.category} • {item.location}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600">
-                    Owner: {item.fullname || 'N/A'}
-                  </div>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-[#0070cc] font-bold">{item.price} DH/{item.rentalPeriod}</span>
-                    <div className="space-x-1">
-                      <button 
-                        onClick={() => handleEditEquipment(item)}
-                        className="h-8 w-8 hover:bg-gray-100 rounded"
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredEquipment.map((item) => (
+                  <tr key={item._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-10 w-10 rounded overflow-hidden">
+                        <img
+                          src={item.image ? `http://localhost:5000${item.image}` : "https://via.placeholder.com/300"}
+                          alt={item.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{item.category}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">{item.location}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">${item.price}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          item.availability === "available"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                       >
-                        <Edit className="h-4 w-4 mx-auto" />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteEquipment(item._id)}
-                        className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600 rounded"
-                      >
-                        <Trash className="h-4 w-4 mx-auto" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {filteredEquipment.length === 0 && (
-              <div className="col-span-3 py-8 text-center text-gray-500">
-                No equipment found matching your search criteria.
-              </div>
-            )}
+                        {item.availability === "available" ? "Available" : "Not Available"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleEditEquipment(item)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteEquipment(item._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

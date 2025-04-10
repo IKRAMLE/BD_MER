@@ -9,10 +9,11 @@ const AuthGuard = ({ children }) => {
   
   useEffect(() => {
     // Check if user is logged in
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
     const userData = localStorage.getItem('user');
     
     setAuthState({
-      isAuthenticated: !!userData,
+      isAuthenticated: !!(token && userData),
       isLoading: false
     });
   }, []);

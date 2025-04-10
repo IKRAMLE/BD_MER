@@ -70,7 +70,8 @@ const Login = () => {
         
         // Store token in localStorage
         if (data.token) {
-          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('authToken', data.token); // Keep both for backward compatibility
         }
         
         // Store user data if needed

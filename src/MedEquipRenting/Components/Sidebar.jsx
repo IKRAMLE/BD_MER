@@ -12,9 +12,9 @@ const Sidebar = ({ isSidebarOpen, menuItems, activeMenuItem, handleMenuClick, ha
     >
       <div className="flex items-center justify-between p-4">
         <div className={`flex items-center ${!isSidebarOpen && "justify-center w-full"}`}>
-          <div className="h-10 w-10 rounded-3xl bg-gradient-to-br from-[#37aaf8] to-[#223e55] flex items-center justify-center mr-2 shadow-md">
-            <img src={logo} alt="MediShare" className="h-8 w-full" />
-          </div>
+        <div className="h-7 w-20 mb-3 -mr-4 -ml-4">
+                <img src={logo} alt="MediShare"  />
+              </div>
           {isSidebarOpen && <span className="font-semibold text-xl">MediShare</span>}
         </div>
       </div>

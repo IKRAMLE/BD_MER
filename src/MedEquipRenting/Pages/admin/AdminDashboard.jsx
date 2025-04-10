@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../Components/ui/card";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
+  CardFooter 
+} from "../../Components/ui/card";
 import { 
   BarChart, 
   Bar, 
@@ -62,13 +69,14 @@ const AdminDashboard = () => {
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       if (!token) {
         throw new Error('Authentication token not found. Please log in again.');
       }
 
       const headers = {
-        'x-auth-token': token
+        'x-auth-token': token,
+        'Authorization': `Bearer ${token}`
       };
 
       // Fetch all dashboard data in parallel

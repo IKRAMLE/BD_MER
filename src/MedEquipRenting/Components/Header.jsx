@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { User, ShoppingCart, Menu, X } from "lucide-react";
 import ShoppingCartComponent from "../Components/ShoppingCard";
+import logo from "/MediShare.png";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -105,6 +106,9 @@ const Navbar = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center group">
+              <div className="h-7 w-20 mb-3 -mr-4">
+                <img src={logo} alt="MediShare"  />
+              </div>
               <span
                 className={`font-medium text-xl ${
                   isScrolled ? "text-gray-900" : "text-gray-800"
@@ -169,7 +173,7 @@ const Navbar = () => {
                 Louer un équipement
               </Link>
               <a
-               href="#contact-us"
+                href="#contact-us"
                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
                 Contact

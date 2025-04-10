@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
-import logo from "/caduceus.png";
+import logo from "/MediShare.png";
 
 const Sidebar = ({ isSidebarOpen, menuItems, activeMenuItem, handleMenuClick, handleLogout }) => {
   
@@ -12,8 +12,8 @@ const Sidebar = ({ isSidebarOpen, menuItems, activeMenuItem, handleMenuClick, ha
     >
       <div className="flex items-center justify-between p-4">
         <div className={`flex items-center ${!isSidebarOpen && "justify-center w-full"}`}>
-          <div className="h-10 w-10 rounded-3xl bg-gradient-to-br from-[#37aaf8] to-[#0070cc] flex items-center justify-center mr-2 shadow-md">
-            <img src={logo} alt="MediShare" className="h-7" />
+          <div className="h-10 w-10 rounded-3xl bg-gradient-to-br from-[#37aaf8] to-[#223e55] flex items-center justify-center mr-2 shadow-md">
+            <img src={logo} alt="MediShare" className="h-8 w-full" />
           </div>
           {isSidebarOpen && <span className="font-semibold text-xl">MediShare</span>}
         </div>

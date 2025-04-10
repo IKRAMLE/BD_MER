@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import MedicalEquipment from "./MedEquipRenting/Pages/MedicalEquipment";
 import Login2 from './MedEquipRenting/Pages/Login';
 import SignUpPage2 from './MedEquipRenting/Pages/Signup';
@@ -13,7 +13,7 @@ import AuthGuard from "./MedEquipRenting/Components/AuthGuard";
 import EquipmentDetails from "./MedEquipRenting/Pages/EquipmentDetails";
 import Favoris from "./MedEquipRenting/Pages/Favoris";
 import Checkout from './MedEquipRenting/Pages/Checkout';
-import AdminDashboard from "./MedEquipRenting/Pages/admin/Dashboard";
+import AdminDashboard from "./MedEquipRenting/Pages/admin/AdminDashboard";
 import AdminUsers from "./MedEquipRenting/Pages/admin/Users";
 import AdminEquipment from "./MedEquipRenting/Pages/admin/AdminEquipment";
 import AdminSettings from "./MedEquipRenting/Pages/admin/Settings";
@@ -43,10 +43,26 @@ const App = () => {
           <Route path="/settings" element={<Settings />} />
 
             {/*Admin protected routes */}
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/equipment" element={<AdminEquipment />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/dashboard" element={
+            <AuthGuard>
+              <AdminDashboard />
+            </AuthGuard>
+          } />
+          <Route path="/admin/users" element={
+            <AuthGuard>
+              <AdminUsers />
+            </AuthGuard>
+          } />
+          <Route path="/admin/equipment" element={
+            <AuthGuard>
+              <AdminEquipment />
+            </AuthGuard>
+          } />
+          <Route path="/admin/settings" element={
+            <AuthGuard>
+              <AdminSettings />
+            </AuthGuard>
+          } />
 
         </Route>
       </Routes>

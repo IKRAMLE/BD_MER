@@ -1,12 +1,12 @@
-import AdminLayout from "@/layouts/AdminLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AdminLayout from "../../layouts/AdminLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../Components/ui/card";
+import { Button } from "../../Components/ui/button";
+import { Input } from "../../Components/ui/input";
+import { Label } from "../../Components/ui/Label";
+import { Switch } from "../../Components/ui/Switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../Components/ui/tabs";
 import { useState, useEffect } from "react";
-import api from "@/utils/api";
+import api from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 

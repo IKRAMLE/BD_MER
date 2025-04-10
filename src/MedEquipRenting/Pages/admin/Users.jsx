@@ -1,6 +1,6 @@
-import AdminLayout from "@/layouts/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../Components/ui/card";
 import { 
   Search, 
   UserPlus, 
@@ -12,8 +12,8 @@ import {
   Download,
   Loader2
 } from "lucide-react";
-import api from "@/utils/api";
-import UserModal from "@/components/UserModal";
+import api from "../../utils/api";
+import UserModal from "../../Components/UserModal";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');

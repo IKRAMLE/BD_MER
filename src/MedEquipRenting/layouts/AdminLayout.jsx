@@ -33,7 +33,7 @@ const AdminLayout = ({ children }) => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/login2');
   };
 
   // Function to determine if a link is active

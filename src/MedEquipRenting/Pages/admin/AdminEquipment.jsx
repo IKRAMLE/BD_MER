@@ -1,10 +1,10 @@
-import AdminLayout from "@/layouts/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout";
 import { useState, useEffect } from "react";
 import { Filter, Search, Plus, Star, Edit, Trash, Eye, Loader2, Package, DollarSign, MapPin, Calendar, Tag, Image as ImageIcon, AlertCircle } from "lucide-react";
-import api from "@/utils/api";
+import api from "../../utils/api";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import EquipmentModal from "@/components/EquipmentModal";
+import EquipmentModal from "../../Components/EquipmentModal";
 
 const Equipment = () => {
   const [searchTerm, setSearchTerm] = useState("");

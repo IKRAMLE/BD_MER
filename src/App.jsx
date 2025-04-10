@@ -42,7 +42,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
 
-            {/*Admin */}
+            {/*Admin protected routes */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/equipment" element={<AdminEquipment />} />

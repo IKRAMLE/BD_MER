@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, CreditCard, Truck, Phone, AlertCircle, Upload } from 'lucide-react';
+import { Calendar, CreditCard, Truck, Phone, AlertCircle, Upload, ArrowLeft } from 'lucide-react';
 import axiosInstance from '../../utils/axiosConfig';
 
 const paymentMethods = [
@@ -294,7 +294,17 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-[#f0f7ff] p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-[#084b88] mb-8">Finalisation de la Commande</h1>
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-[#084b88] hover:text-[#0070cc] transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            Retour
+          </button>
+          <h1 className="text-3xl font-bold text-[#084b88]">Finalisation de la Commande</h1>
+          <div className="w-20"></div> {/* Empty div for spacing */}
+        </div>
 
         {/* Personal Information Form */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -374,27 +384,84 @@ const Checkout = () => {
           <h2 className="text-xl font-semibold text-[#084b88] mb-4">Récapitulatif de la Location</h2>
           {cartItems.map(item => (
             <div key={item._id} className="border-b border-gray-200 py-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-[#084b88]">{item.name}</h3>
-                  <p className="text-sm text-[#7d7469]">Quantité: {item.quantity}</p>
-                  <p className="text-sm text-[#7d7469]">Période: {rentalPeriods[item._id]} jours</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-[#084b88]">{calculateItemTotal(item)} MAD</p>
-                  <p className="text-sm text-green-600">{getDiscountText(rentalPeriods[item._id])}</p>
+              <div className="flex gap-4">
+                <img
+                  src={`http://localhost:5000${item.image}`}
+                  alt={item.name}
+                  className="w-24 h-24 rounded-lg object-cover"
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-[#084b88]">{item.name}</h3>
+                      <p className="text-sm text-[#7d7469]">Quantité: {item.quantity}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4 text-[#0070cc]" />
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          min="1"
+                          value={customPeriods[item._id] || 1}
+                          onChange={(e) => handleCustomPeriodChange(item._id, e.target.value)}
+                          className="w-16 border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
+                        />
+                        <select
+                          value={periodTypes[item._id] || 'day'}
+                          onChange={(e) => handlePeriodTypeChange(item._id, e.target.value)}
+                          className="border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
+                        >
+                          <option value="day">Jours</option>
+                          <option value="week">Semaines</option>
+                          <option value="month">Mois</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-sm text-[#7d7469]">
+                      Total: {rentalPeriods[item._id]} jours
+                    </p>
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#7d7469]">Prix par jour:</span>
+                      <span className="font-medium text-[#084b88]">{item.price} MAD</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#7d7469]">Prix pour la période:</span>
+                      <span className="font-medium text-[#084b88]">
+                        {calculateItemTotal(item)} MAD
+                        {getDiscountText(rentalPeriods[item._id]) && (
+                          <span className="text-green-600 ml-2">{getDiscountText(rentalPeriods[item._id])}</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#7d7469]">Dépôt de garantie (70%):</span>
+                      <span className="font-medium text-[#084b88]">{calculateItemTotal(item) * 0.7} MAD</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex justify-between items-center">
-              <span className="font-medium text-[#084b88]">Total</span>
-              <span className="font-bold text-[#084b88]">{total} MAD</span>
-            </div>
-            <div className="flex justify-between items-center mt-2">
-              <span className="font-medium text-[#084b88]">Dépôt de garantie (70%)</span>
-              <span className="font-bold text-[#084b88]">{deposit} MAD</span>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-[#084b88]">Total pour la période</span>
+                <span className="font-bold text-[#084b88]">{total} MAD</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-[#084b88]">Dépôt de garantie total (70%)</span>
+                <span className="font-bold text-[#084b88]">{deposit} MAD</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                <span className="font-bold text-lg text-[#084b88]">Total à payer</span>
+                <span className="font-bold text-lg text-[#084b88]">{total + deposit} MAD</span>
+              </div>
             </div>
             <div className="mt-4 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-[#084b88]">

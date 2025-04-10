@@ -98,9 +98,19 @@ const Checkout = () => {
 
   const calculateItemTotal = (item) => {
     const days = rentalPeriods[item._id];
-    const basePrice = item.price * item.quantity * days;
+    const basePrice = item.price * item.quantity;
     const discount = calculateDiscount(days);
     return basePrice * (1 - discount);
+  };
+
+  const calculateDeposit = (item) => {
+    const basePrice = item.price * item.quantity;
+    return basePrice * 0.7; // 70% of the base price
+  };
+
+  const getPeriodText = (item) => {
+    const periodType = periodTypes[item._id] || item.rentalPeriod || 'day';
+    return periodType === 'month' ? 'mois' : 'jour';
   };
 
   const handlePeriodChange = (itemId, days) => {
@@ -414,24 +424,23 @@ const Checkout = () => {
                           className="w-16 border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
                         />
                         <select
-                          value={periodTypes[item._id] || 'day'}
+                          value={periodTypes[item._id] || item.rentalPeriod || 'day'}
                           onChange={(e) => handlePeriodTypeChange(item._id, e.target.value)}
                           className="border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
                         >
                           <option value="day">Jours</option>
-                          <option value="week">Semaines</option>
                           <option value="month">Mois</option>
                         </select>
                       </div>
                     </div>
                     <p className="text-sm text-[#7d7469]">
-                      Total: {rentalPeriods[item._id]} jours
+                      Total: {rentalPeriods[item._id]} {getPeriodText(item)}
                     </p>
                   </div>
 
                   <div className="mt-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#7d7469]">Prix par jour:</span>
+                      <span className="text-[#7d7469]">Prix par {getPeriodText(item)}:</span>
                       <span className="font-medium text-[#084b88]">{item.price} MAD</span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -445,7 +454,7 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[#7d7469]">Dépôt de garantie (70%):</span>
-                      <span className="font-medium text-[#084b88]">{calculateItemTotal(item) * 0.7} MAD</span>
+                      <span className="font-medium text-[#084b88]">{calculateDeposit(item)} MAD</span>
                     </div>
                   </div>
                 </div>

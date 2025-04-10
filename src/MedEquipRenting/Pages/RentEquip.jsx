@@ -106,18 +106,27 @@ function RentEquip() {
       // Update quantity if item exists
       newCart = existingCart.map(cartItem =>
         cartItem.id === item._id
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          ? { 
+              ...cartItem, 
+              quantity: cartItem.quantity + 1,
+              days: item.rentalPeriod === 'month' ? 30 : 7, // Set default period based on rentalPeriod
+              rentalPeriod: item.rentalPeriod // Store the rental period type
+            }
           : cartItem
       );
     } else {
-      // Add new item
+      // Add new item with all necessary details
       newCart = [...existingCart, {
         id: item._id,
         name: item.name,
         price: item.price,
         image: item.image ? `http://localhost:5000${item.image}` : '/api/placeholder/100/100',
-        days: 7,
-        quantity: 1
+        days: item.rentalPeriod === 'month' ? 30 : 7, // Set default period based on rentalPeriod
+        rentalPeriod: item.rentalPeriod, // Store the rental period type
+        quantity: 1,
+        description: item.description,
+        category: item.category,
+        condition: item.condition
       }];
     }
     

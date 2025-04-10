@@ -61,19 +61,23 @@ const Checkout = () => {
           return {
             ...response.data.data,
             quantity: item.quantity,
-            days: item.days || 7 // Default to 7 days if not set
+            days: item.days || 1, // Default to 1 if not set
+            rentalPeriod: response.data.data.rentalPeriod || 'day' // Get rental period from database
           };
         })
       );
 
       setCartItems(itemsWithDetails);
       
-      // Initialize rental periods
+      // Initialize rental periods and period types
       const periods = {};
+      const periodTypes = {};
       itemsWithDetails.forEach(item => {
         periods[item._id] = item.days;
+        periodTypes[item._id] = item.rentalPeriod;
       });
       setRentalPeriods(periods);
+      setPeriodTypes(periodTypes);
       
       // Calculate total
       calculateTotal(itemsWithDetails, periods);

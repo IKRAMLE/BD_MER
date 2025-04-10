@@ -125,7 +125,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                         </button>
                       </div>
                       <div className="flex items-center text-sm text-gray-500 mt-1">
-                        <span>{item.price} DH / jour </span>
+                        <span>{item.price} DH / {item.rentalPeriod === 'month' ? 'mois' : 'jour'} </span>
                       </div>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center bg-white rounded-full border border-gray-200">
@@ -143,7 +143,9 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                             +
                           </button>
                         </div>
-                        <span className="font-medium text-blue-600">{item.price * item.quantity} DH</span>
+                        <span className="font-medium text-blue-600">
+                          {item.price} DH
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -154,7 +156,7 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
               <div className="mt-6 pt-4 border-t border-dashed">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-500">Sous-total</span>
-                  <span>{calculateTotal()} €</span>
+                  <span>{calculateTotal()} DH</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-500">Frais de service</span>

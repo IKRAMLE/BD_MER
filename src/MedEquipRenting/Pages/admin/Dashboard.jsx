@@ -38,7 +38,8 @@ import {
   Clock,
   AlertCircle,
   CheckCircle2,
-  XCircle
+  XCircle,
+  RefreshCw
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,6 @@ const AdminDashboard = () => {
     revenue: 0,
     activeRentals: 0
   });
-
   const [equipmentStatus, setEquipmentStatus] = useState([]);
   const [monthlyRentals, setMonthlyRentals] = useState([]);
   const [equipmentCategories, setEquipmentCategories] = useState([]);
@@ -61,69 +61,83 @@ const AdminDashboard = () => {
   const [quickActions, setQuickActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const headers = {
-          'x-auth-token': token
-        };
-
-        // Fetch all dashboard data in parallel
-        const [
-          statsResponse,
-          activityResponse,
-          actionsResponse
-        ] = await Promise.all([
-          axios.get('http://localhost:5000/api/dashboard/stats', { headers })
-            .catch(err => {
-              console.error('Error fetching stats:', err);
-              return { data: { success: false, error: 'Failed to fetch dashboard stats' } };
-            }),
-          axios.get('http://localhost:5000/api/dashboard/recent-activity', { headers })
-            .catch(err => {
-              console.error('Error fetching activity:', err);
-              return { data: { success: false, error: 'Failed to fetch recent activity' } };
-            }),
-          axios.get('http://localhost:5000/api/dashboard/quick-actions', { headers })
-            .catch(err => {
-              console.error('Error fetching quick actions:', err);
-              return { data: { success: false, error: 'Failed to fetch quick actions' } };
-            })
-        ]);
-
-        // Check if backend is available
-        if (!statsResponse.data.success && !activityResponse.data.success && !actionsResponse.data.success) {
-          setError('Backend server is not available. Please make sure the server is running on port 5000.');
-          return;
-        }
-
-        if (statsResponse.data.success) {
-          const { stats, equipmentStatus, monthlyRentals, equipmentCategories } = statsResponse.data.data;
-          setStats(stats);
-          setEquipmentStatus(equipmentStatus);
-          setMonthlyRentals(monthlyRentals);
-          setEquipmentCategories(equipmentCategories);
-        }
-
-        if (activityResponse.data.success) {
-          setRecentActivity(activityResponse.data.data);
-        }
-
-        if (actionsResponse.data.success) {
-          setQuickActions(actionsResponse.data.data);
-        }
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data. Please check your connection and try again.');
-      } finally {
-        setLoading(false);
+  // Function to fetch dashboard data from the backend
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found. Please log in again.');
       }
-    };
 
+      const headers = {
+        'x-auth-token': token
+      };
+
+      // Fetch all dashboard data in parallel
+      const [
+        statsResponse,
+        activityResponse,
+        actionsResponse
+      ] = await Promise.all([
+        axios.get('http://localhost:5000/api/dashboard/stats', { headers })
+          .catch(err => {
+            console.error('Error fetching stats:', err);
+            return { data: { success: false, error: 'Failed to fetch dashboard stats' } };
+          }),
+        axios.get('http://localhost:5000/api/dashboard/recent-activity', { headers })
+          .catch(err => {
+            console.error('Error fetching activity:', err);
+            return { data: { success: false, error: 'Failed to fetch recent activity' } };
+          }),
+        axios.get('http://localhost:5000/api/dashboard/quick-actions', { headers })
+          .catch(err => {
+            console.error('Error fetching quick actions:', err);
+            return { data: { success: false, error: 'Failed to fetch quick actions' } };
+          })
+      ]);
+
+      // Check if backend is available
+      if (!statsResponse.data.success && !activityResponse.data.success && !actionsResponse.data.success) {
+        throw new Error('Backend server is not available');
+      }
+
+      if (statsResponse.data.success) {
+        const { stats, equipmentStatus, monthlyRentals, equipmentCategories } = statsResponse.data.data;
+        setStats(stats);
+        setEquipmentStatus(equipmentStatus);
+        setMonthlyRentals(monthlyRentals);
+        setEquipmentCategories(equipmentCategories);
+      }
+
+      if (activityResponse.data.success) {
+        setRecentActivity(activityResponse.data.data);
+      }
+
+      if (actionsResponse.data.success) {
+        setQuickActions(actionsResponse.data.data);
+      }
+    } catch (err) {
+      console.error('Error in dashboard data handling:', err);
+      setError('Failed to load dashboard data. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on component mount and when refresh key changes
+  useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [refreshKey]);
+
+  // Function to handle refresh button click
+  const handleRefresh = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
 
   // Function to format time ago
   const formatTimeAgo = (date) => {
@@ -155,6 +169,20 @@ const AdminDashboard = () => {
     }
   };
 
+  // Function to get status icon based on activity type
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'success':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'warning':
+        return <AlertCircle className="h-4 w-4 text-amber-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -180,7 +208,7 @@ const AdminDashboard = () => {
           </div>
           <Button 
             variant="outline" 
-            onClick={() => window.location.reload()}
+            onClick={handleRefresh}
             className="mt-4"
           >
             Retry
@@ -190,20 +218,6 @@ const AdminDashboard = () => {
     );
   }
 
-  // Function to get status icon based on activity type
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'success':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'warning':
-        return <AlertCircle className="h-4 w-4 text-amber-500" />;
-      case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
   return (
     <AdminLayout>
       <div className="space-y-8 p-4">
@@ -212,7 +226,16 @@ const AdminDashboard = () => {
             <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#084b88] to-[#0ea5e9] bg-clip-text text-transparent">Dashboard</h1>
             <p className="text-gray-600 mt-1">Overview of platform metrics and performance</p>
           </div>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRefresh}
+              className="flex items-center gap-1"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </Button>
             <Tabs defaultValue="today" className="w-[200px]">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="today">Today</TabsTrigger>
@@ -492,7 +515,11 @@ const AdminDashboard = () => {
                 {quickActions.map((action, index) => (
                   <Button 
                     key={index} 
-                    className={`${action.color} text-white w-full justify-start`}
+                    className={`${
+                      action.name.toLowerCase().includes('maintenance') 
+                        ? 'bg-amber-600 hover:bg-amber-700' 
+                        : action.color
+                    } text-white w-full justify-start`}
                   >
                     {getIconComponent(action.icon)}
                     <span className="ml-2">{action.name}</span>

@@ -76,15 +76,17 @@ const Login = () => {
         // Store user data if needed
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
+          
+          // Redirect based on user role
+          if (data.user.role === 'Admin') {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
         }
         
         // Show success message
         setSuccess(true);
-        
-        // Redirect to dashboard after 2 seconds
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000);
       } else {
         // Handle non-JSON response (likely an error page)
         const text = await response.text();

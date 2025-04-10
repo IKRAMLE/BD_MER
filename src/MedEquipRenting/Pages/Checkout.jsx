@@ -43,6 +43,7 @@ const Checkout = () => {
     city: '',
     phone: ''
   });
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     loadCartItems();
@@ -181,6 +182,32 @@ const Checkout = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const validatePersonalInfo = () => {
+    const errors = {};
+    const requiredFields = ['firstName', 'lastName', 'cin', 'address', 'city', 'phone'];
+    
+    requiredFields.forEach(field => {
+      if (!personalInfo[field]) {
+        errors[field] = 'Ce champ est obligatoire';
+      }
+    });
+
+    // Validate phone number format
+    if (personalInfo.phone && !/^[0-9]{10}$/.test(personalInfo.phone)) {
+      errors.phone = 'Le numéro de téléphone doit contenir 10 chiffres';
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleReceiptUpload = (e) => {
@@ -191,20 +218,16 @@ const Checkout = () => {
   };
 
   const handleConfirmOrder = async () => {
+    // Validate personal information
+    if (!validatePersonalInfo()) {
+      return;
+    }
+
     if (!selectedPayment) {
       setError('Veuillez sélectionner un mode de paiement');
       return;
     }
 
-    // Validate personal information
-    const requiredFields = ['firstName', 'lastName', 'cin', 'address', 'city', 'phone'];
-    const missingFields = requiredFields.filter(field => !personalInfo[field]);
-    if (missingFields.length > 0) {
-      setError('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
-    // Validate receipt upload for non-cash payments
     if (selectedPayment !== 'cash' && !receiptFile) {
       setError('Veuillez télécharger le reçu de paiement');
       return;
@@ -325,71 +348,118 @@ const Checkout = () => {
           <h2 className="text-xl font-semibold text-[#084b88] mb-4">Informations Personnelles</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">Prénom *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                Prénom <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="firstName"
                 value={personalInfo.firstName}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.firstName ? 'border-red-500' : ''
+                }`}
                 required
               />
+              {fieldErrors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.firstName}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">Nom *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                Nom <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="lastName"
                 value={personalInfo.lastName}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.lastName ? 'border-red-500' : ''
+                }`}
                 required
               />
+              {fieldErrors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.lastName}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">CIN *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                CIN <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="cin"
                 value={personalInfo.cin}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.cin ? 'border-red-500' : ''
+                }`}
                 required
               />
+              {fieldErrors.cin && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.cin}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">Téléphone *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                Téléphone <span className="text-red-500">*</span>
+              </label>
               <input
                 type="tel"
                 name="phone"
                 value={personalInfo.phone}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.phone ? 'border-red-500' : ''
+                }`}
                 required
+                pattern="[0-9]{10}"
+                title="Veuillez entrer un numéro de téléphone valide (10 chiffres)"
               />
+              {fieldErrors.phone && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.phone}</p>
+              )}
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">Adresse *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                Adresse <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="address"
                 value={personalInfo.address}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.address ? 'border-red-500' : ''
+                }`}
                 required
               />
+              {fieldErrors.address && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.address}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">Ville *</label>
+              <label className="block text-sm font-medium text-[#4e4942] mb-1">
+                Ville <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="city"
                 value={personalInfo.city}
                 onChange={handlePersonalInfoChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent"
+                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
+                  fieldErrors.city ? 'border-red-500' : ''
+                }`}
                 required
               />
+              {fieldErrors.city && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.city}</p>
+              )}
             </div>
+          </div>
+          <div className="mt-4 text-sm text-[#7d7469]">
+            <p><span className="text-red-500">*</span> Champs obligatoires</p>
           </div>
         </div>
 

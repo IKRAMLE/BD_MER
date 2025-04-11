@@ -229,44 +229,54 @@ const Checkout = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append('receipt', receiptFile);
-      formData.append('orderData', JSON.stringify({
+      setLoading(true);
+      setError(null);
+
+      // Prepare order data
+      const orderData = {
         items: cartItems.map(item => ({
           equipmentId: item._id,
           quantity: item.quantity,
           rentalDays: rentalPeriods[item._id],
           price: item.price,
-          rentalPeriod: periodTypes[item._id] || item.rentalPeriod || 'day',
-          name: item.name,
-          image: item.image
+          rentalPeriod: periodTypes[item._id] || item.rentalPeriod || 'day'
         })),
         paymentMethod: selectedPayment,
         totalAmount: total,
-        depositAmount: deposit,
-        personalInfo,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      }));
+        personalInfo
+      };
 
+      // Create FormData for file upload
+      const formData = new FormData();
+      if (receiptFile) {
+        formData.append('receipt', receiptFile);
+      }
+      formData.append('orderData', JSON.stringify(orderData));
+
+      // Submit order to backend
       const response = await axiosInstance.post('/orders', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
-      const ownerResponse = await axiosInstance.get(`/users/${cartItems[0].ownerId}`);
-      setOwnerDetails(ownerResponse.data.data);
-      setShowOwnerContact(true);
-      
-      localStorage.removeItem('cart');
-      window.dispatchEvent(new CustomEvent('cartUpdated', { detail: 0 }));
 
-      // Navigate to requests page
-      navigate('/requests');
-    } catch (error) {
-      console.error('Error confirming order:', error);
-      setError('Erreur lors de la confirmation de la commande');
+      if (response.data.success) {
+        // Clear cart
+        localStorage.removeItem('cart');
+        
+        // Show success message
+        alert('Commande créée avec succès! L\'équipement sera disponible après approbation du propriétaire.');
+        
+        // Redirect to orders page
+        navigate('/orders');
+      } else {
+        setError(response.data.message || 'Erreur lors de la création de la commande');
+      }
+    } catch (err) {
+      console.error('Error creating order:', err);
+      setError(err.response?.data?.message || 'Erreur lors de la création de la commande');
+    } finally {
+      setLoading(false);
     }
   };
 

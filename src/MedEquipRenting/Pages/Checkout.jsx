@@ -92,21 +92,26 @@ const Checkout = () => {
 
   const calculateDiscount = (days) => {
     if (days >= 30) {
-      return days >= 60 ? 0.10 : 0.05; // 10% for 60+ days, 5% for 30+ days
+      return days >= 60 ? 0.10 : 0.05; 
     }
     return 0;
   };
 
   const calculateItemTotal = (item) => {
     const days = rentalPeriods[item._id];
+    const periodType = periodTypes[item._id] || item.rentalPeriod || 'day';
     const basePrice = item.price * item.quantity;
-    const discount = calculateDiscount(days);
-    return basePrice * (1 - discount);
+    
+    if (periodType === 'month') {
+      return basePrice * Math.ceil(days / 30); 
+    } else {
+      return basePrice * days; 
+    }
   };
 
   const calculateDeposit = (item) => {
     const basePrice = item.price * item.quantity;
-    return basePrice * 0.7; // 70% of the base price
+    return basePrice * 0.7; 
   };
 
   const getPeriodText = (item) => {
@@ -128,15 +133,10 @@ const Checkout = () => {
     // Convert current value to days based on new type
     const currentValue = customPeriods[itemId] || 1;
     let days;
-    switch (type) {
-      case 'week':
-        days = currentValue * 7;
-        break;
-      case 'month':
-        days = currentValue * 30;
-        break;
-      default:
-        days = currentValue;
+    if (type === 'month') {
+      days = currentValue * 30;
+    } else {
+      days = currentValue;
     }
     handlePeriodChange(itemId, days);
   };
@@ -147,15 +147,10 @@ const Checkout = () => {
     
     // Convert to days based on period type
     let days;
-    switch (periodTypes[itemId]) {
-      case 'week':
-        days = numValue * 7;
-        break;
-      case 'month':
-        days = numValue * 30;
-        break;
-      default:
-        days = numValue;
+    if (periodTypes[itemId] === 'month') {
+      days = numValue * 30;
+    } else {
+      days = numValue;
     }
     handlePeriodChange(itemId, days);
   };
@@ -241,12 +236,17 @@ const Checkout = () => {
           equipmentId: item._id,
           quantity: item.quantity,
           rentalDays: rentalPeriods[item._id],
-          price: item.price
+          price: item.price,
+          rentalPeriod: periodTypes[item._id] || item.rentalPeriod || 'day',
+          name: item.name,
+          image: item.image
         })),
         paymentMethod: selectedPayment,
         totalAmount: total,
         depositAmount: deposit,
-        personalInfo
+        personalInfo,
+        status: 'pending',
+        createdAt: new Date().toISOString()
       }));
 
       const response = await axiosInstance.post('/orders', formData, {
@@ -261,6 +261,9 @@ const Checkout = () => {
       
       localStorage.removeItem('cart');
       window.dispatchEvent(new CustomEvent('cartUpdated', { detail: 0 }));
+
+      // Navigate to requests page
+      navigate('/requests');
     } catch (error) {
       console.error('Error confirming order:', error);
       setError('Erreur lors de la confirmation de la commande');
@@ -503,9 +506,6 @@ const Checkout = () => {
                         </select>
                       </div>
                     </div>
-                    <p className="text-sm text-[#7d7469]">
-                      Total: {rentalPeriods[item._id]} {getPeriodText(item)}
-                    </p>
                   </div>
 
                   <div className="mt-4 space-y-2">
@@ -517,9 +517,6 @@ const Checkout = () => {
                       <span className="text-[#7d7469]">Prix pour la période:</span>
                       <span className="font-medium text-[#084b88]">
                         {calculateItemTotal(item)} MAD
-                        {getDiscountText(rentalPeriods[item._id]) && (
-                          <span className="text-green-600 ml-2">{getDiscountText(rentalPeriods[item._id])}</span>
-                        )}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">

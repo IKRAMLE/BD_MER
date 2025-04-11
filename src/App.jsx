@@ -17,6 +17,7 @@ import AdminDashboard from "./MedEquipRenting/Pages/admin/AdminDashboard";
 import AdminUsers from "./MedEquipRenting/Pages/admin/Users";
 import AdminEquipment from "./MedEquipRenting/Pages/admin/AdminEquipment";
 import AdminSettings from "./MedEquipRenting/Pages/admin/Settings";
+import Requests from "./MedEquipRenting/Pages/Requests";
 
 
 const App = () => {
@@ -36,7 +37,7 @@ const App = () => {
         <Route >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-equipment" element={<MyEquipment />} />
-          <Route path="/requests" element={<div>Requests Page</div>} />
+          <Route path="/requests" element={<Requests />} />
           <Route path="/chat" element={<div>Chat Page</div>} />
           <Route path="/favorites" element={<Favoris />} />
           <Route path="/profile" element={<Profile />} />

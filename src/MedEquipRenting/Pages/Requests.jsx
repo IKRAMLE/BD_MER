@@ -59,87 +59,57 @@ const Requests = () => {
         throw new Error("User ID not found");
       }
 
-      // Mock request data (replace with actual API call)
-      // This would be an API call like: const response = await axiosInstance.get('/requests');
-      const mockRequests = [
-        {
-          _id: "req1",
-          equipmentId: "equip1",
-          equipmentName: "Moniteur cardiaque portable",
-          requesterId: "user2",
-          requesterName: "Dr. Sophie Martin",
-          requesterPhoto: "/api/placeholder/50/50",
-          status: "pending",
-          startDate: "2025-04-15",
-          endDate: "2025-04-20",
-          rentalPeriod: "day",
-          totalPrice: 250,
-          message: "J'ai besoin de ce moniteur pour une mission humanitaire urgente la semaine prochaine.",
-          createdAt: "2025-04-09T10:30:00Z",
-          equipmentPhoto: "/api/placeholder/100/100"
-        },
-        {
-          _id: "req2",
-          equipmentId: "equip2",
-          equipmentName: "Échographe portatif",
-          requesterId: "user3",
-          requesterName: "Dr. Antoine Dubois",
-          requesterPhoto: "/api/placeholder/50/50",
-          status: "approved",
-          startDate: "2025-04-20",
-          endDate: "2025-04-25",
-          rentalPeriod: "day",
-          totalPrice: 500,
-          message: "Pour utilisation dans notre clinique mobile dans des zones rurales.",
-          createdAt: "2025-04-08T14:20:00Z",
-          equipmentPhoto: "/api/placeholder/100/100"
-        },
-        {
-          _id: "req3",
-          equipmentId: "equip3",
-          equipmentName: "Défibrillateur automatique",
-          requesterId: "user4",
-          requesterName: "Dr. Camille Laurent",
-          requesterPhoto: "/api/placeholder/50/50",
-          status: "rejected",
-          startDate: "2025-04-12",
-          endDate: "2025-04-18",
-          rentalPeriod: "day",
-          totalPrice: 300,
-          message: "Besoin pour un événement sportif communautaire ce weekend.",
-          createdAt: "2025-04-07T09:15:00Z",
-          equipmentPhoto: "/api/placeholder/100/100"
-        },
-        {
-          _id: "req4",
-          equipmentId: "equip4",
-          equipmentName: "Analyseur de sang portable",
-          requesterId: "user5",
-          requesterName: "Dr. Julie Moreau",
-          requesterPhoto: "/api/placeholder/50/50",
-          status: "pending",
-          startDate: "2025-04-18",
-          endDate: "2025-04-28",
-          rentalPeriod: "day",
-          totalPrice: 450,
-          message: "Pour une étude clinique de 10 jours dans notre établissement.",
-          createdAt: "2025-04-10T16:45:00Z",
-          equipmentPhoto: "/api/placeholder/100/100"
-        },
-      ];
+      // Fetch orders from the backend API
+      const response = await axiosInstance.get('/orders/owner');
+      
+      if (response.data.success) {
+        const orders = response.data.data;
+        
+        // Transform orders data to match the component's expected format
+        const transformedRequests = orders.map(order => {
+          // Ensure we have valid items and equipment data
+          const firstItem = order.items && order.items[0];
+          const equipment = firstItem?.equipmentId;
+          const user = order.userId;
 
-      setRequests(mockRequests);
+          if (!equipment) {
+            console.warn('Order missing equipment data:', order);
+            return null;
+          }
 
-      // Calculate stats
-      const stats = {
-        totalRequests: mockRequests.length,
-        pending: mockRequests.filter(req => req.status === 'pending').length,
-        approved: mockRequests.filter(req => req.status === 'approved').length,
-        rejected: mockRequests.filter(req => req.status === 'rejected').length,
-      };
-      setStats(stats);
+          return {
+            _id: order._id,
+            equipmentId: equipment._id,
+            equipmentName: equipment.name || 'Unknown Equipment',
+            requesterId: user?._id,
+            requesterName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Unknown User',
+            requesterPhoto: user?.photo || "/api/placeholder/50/50",
+            status: order.status || 'pending',
+            startDate: order.startDate || new Date().toISOString(),
+            endDate: order.endDate || new Date().toISOString(),
+            rentalPeriod: firstItem?.rentalPeriod || 'day',
+            totalPrice: order.totalAmount || 0,
+            message: order.message || "Aucun message",
+            createdAt: order.createdAt || new Date().toISOString(),
+            equipmentPhoto: equipment.photos?.[0] || "/api/placeholder/100/100"
+          };
+        }).filter(request => request !== null); // Remove any null entries
 
-      setError(null);
+        setRequests(transformedRequests);
+
+        // Calculate stats
+        const stats = {
+          totalRequests: transformedRequests.length,
+          pending: transformedRequests.filter(req => req.status === 'pending').length,
+          approved: transformedRequests.filter(req => req.status === 'approved').length,
+          rejected: transformedRequests.filter(req => req.status === 'rejected').length,
+        };
+        setStats(stats);
+
+        setError(null);
+      } else {
+        throw new Error(response.data.message || "Failed to fetch requests");
+      }
     } catch (err) {
       console.error("Error fetching requests:", err);
       setError("Échec du chargement des demandes. Veuillez réessayer plus tard.");
@@ -188,27 +158,32 @@ const Requests = () => {
   const handleApprove = async (requestId) => {
     setLoading(true);
     try {
-      // This would be your actual API call
-      // const response = await axiosInstance.put(`/requests/${requestId}`, { status: 'approved' });
+      const response = await axiosInstance.put(`/orders/${requestId}/status`, {
+        status: 'approved'
+      });
       
-      // Update state to reflect changes
-      setRequests(prev => 
-        prev.map(req => 
-          req._id === requestId 
-            ? { ...req, status: 'approved' } 
-            : req
-        )
-      );
-      
-      // Update stats
-      setStats(prev => ({
-        ...prev,
-        pending: prev.pending - 1,
-        approved: prev.approved + 1
-      }));
-      
-      setModalOpen(false);
-      setSelectedRequest(null);
+      if (response.data.success) {
+        // Update state to reflect changes
+        setRequests(prev => 
+          prev.map(req => 
+            req._id === requestId 
+              ? { ...req, status: 'approved' } 
+              : req
+          )
+        );
+        
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          pending: prev.pending - 1,
+          approved: prev.approved + 1
+        }));
+        
+        setModalOpen(false);
+        setSelectedRequest(null);
+      } else {
+        throw new Error(response.data.message || "Failed to approve request");
+      }
     } catch (err) {
       console.error("Error approving request:", err);
       setError("Échec de l'approbation de la demande. Veuillez réessayer.");
@@ -220,27 +195,32 @@ const Requests = () => {
   const handleReject = async (requestId) => {
     setLoading(true);
     try {
-      // This would be your actual API call
-      // const response = await axiosInstance.put(`/requests/${requestId}`, { status: 'rejected' });
+      const response = await axiosInstance.put(`/orders/${requestId}/status`, {
+        status: 'rejected'
+      });
       
-      // Update state to reflect changes
-      setRequests(prev => 
-        prev.map(req => 
-          req._id === requestId 
-            ? { ...req, status: 'rejected' } 
-            : req
-        )
-      );
-      
-      // Update stats
-      setStats(prev => ({
-        ...prev,
-        pending: prev.pending - 1,
-        rejected: prev.rejected + 1
-      }));
-      
-      setModalOpen(false);
-      setSelectedRequest(null);
+      if (response.data.success) {
+        // Update state to reflect changes
+        setRequests(prev => 
+          prev.map(req => 
+            req._id === requestId 
+              ? { ...req, status: 'rejected' } 
+              : req
+          )
+        );
+        
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          pending: prev.pending - 1,
+          rejected: prev.rejected + 1
+        }));
+        
+        setModalOpen(false);
+        setSelectedRequest(null);
+      } else {
+        throw new Error(response.data.message || "Failed to reject request");
+      }
     } catch (err) {
       console.error("Error rejecting request:", err);
       setError("Échec du rejet de la demande. Veuillez réessayer.");

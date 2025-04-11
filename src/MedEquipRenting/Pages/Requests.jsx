@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList, Check, X, Clock, Mail, Phone, MapPin } from "lucide-react";
+import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList, Check, X, Clock, Mail, Phone, MapPin, Paperclip } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../../MedEquipRenting/Components/Sidebar";
 import AuthenticationRequired from "../Components/AuthenticationRequired";
@@ -93,7 +93,7 @@ const Requests = () => {
             totalPrice: order.totalAmount || 0,
             message: order.message || "Aucun message",
             createdAt: order.createdAt || new Date().toISOString(),
-            equipmentPhoto: equipment.photos?.[0] || "/api/placeholder/100/100",
+            equipmentPhoto: equipment.image || "/api/placeholder/100/100",
             personalInfo: {
               firstName: personalInfo.firstName || '',
               lastName: personalInfo.lastName || '',
@@ -108,7 +108,7 @@ const Requests = () => {
               organization: personalInfo.organization || ''
             }
           };
-        }).filter(request => request !== null); // Remove any null entries
+        }).filter(request => request !== null); 
 
         setRequests(transformedRequests);
 
@@ -457,8 +457,12 @@ const Requests = () => {
                               <div className="h-12 w-12 flex-shrink-0">
                                 <img 
                                   className="h-12 w-12 rounded-md object-cover" 
-                                  src={request.equipmentPhoto} 
+                                  src={`http://localhost:5000${request.equipmentPhoto}`} 
                                   alt={request.equipmentName} 
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "/placeholder-equipment.jpg";
+                                  }}
                                 />
                               </div>
                               <div className="ml-4">
@@ -469,19 +473,8 @@ const Requests = () => {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="h-8 w-8 flex-shrink-0">
-                                <img 
-                                  className="h-8 w-8 rounded-full" 
-                                  src={request.requesterPhoto} 
-                                  alt={request.requesterName} 
-                                />
-                              </div>
-                              <div className="ml-3">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {request.requesterName}
-                                </div>
-                              </div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {request.requesterName}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -543,8 +536,12 @@ const Requests = () => {
                 <div className="h-24 w-24 rounded-xl border-4 border-white shadow-lg overflow-hidden">
                   <img 
                     className="h-full w-full object-cover"
-                    src={selectedRequest.equipmentPhoto}
+                    src={`http://localhost:5000${selectedRequest.equipmentPhoto}`}
                     alt={selectedRequest.equipmentName}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/placeholder-equipment.jpg";
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -611,8 +608,28 @@ const Requests = () => {
                       <MessageSquare className="h-4 w-4 mr-2 text-blue-600" />
                       Message du demandeur
                     </h3>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-sm text-gray-700">{selectedRequest.message}</p>
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                      <div className="flex items-start">
+                        <div className="bg-blue-100 p-2 rounded-full mr-3">
+                          <MessageSquare className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-700 whitespace-pre-line">{selectedRequest.message || "Aucun message"}</p>
+                          {selectedRequest.messageFile && (
+                            <div className="mt-3 flex items-center">
+                              <Paperclip className="h-4 w-4 text-blue-600 mr-2" />
+                              <a 
+                                href={`http://localhost:5000${selectedRequest.messageFile}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:underline"
+                              >
+                                Pièce jointe
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

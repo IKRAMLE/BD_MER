@@ -45,6 +45,11 @@ const Checkout = () => {
     phone: ''
   });
   const [fieldErrors, setFieldErrors] = useState({});
+  const [message, setMessage] = useState('');
+  const [messageFile, setMessageFile] = useState(null);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [messageError, setMessageError] = useState(null);
+  const [messageSuccess, setMessageSuccess] = useState(false);
 
   useEffect(() => {
     loadCartItems();
@@ -218,6 +223,61 @@ const Checkout = () => {
     }
   };
 
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const handleMessageFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMessageFile(file);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) {
+      setMessageError('Veuillez entrer un message');
+      return;
+    }
+
+    try {
+      setSendingMessage(true);
+      setMessageError(null);
+
+      // Create FormData for message
+      const formData = new FormData();
+      formData.append('message', message);
+      if (messageFile) {
+        formData.append('file', messageFile);
+      }
+
+      // Get the first item's owner ID
+      if (cartItems.length > 0) {
+        formData.append('ownerId', cartItems[0].userId);
+      }
+
+      // Send message to backend
+      const response = await axiosInstance.post('/chat/message', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        setMessageSuccess(true);
+        setMessage('');
+        setMessageFile(null);
+      } else {
+        setMessageError(response.data.message || 'Erreur lors de l\'envoi du message');
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setMessageError('Erreur lors de l\'envoi du message');
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
   const handleConfirmOrder = async () => {
     // Validate personal information
     if (!validatePersonalInfo()) {
@@ -250,13 +310,17 @@ const Checkout = () => {
         paymentMethod: selectedPayment,
         totalAmount: total,
         deposit: deposit,
-        personalInfo
+        personalInfo,
+        message: message || "Aucun message"
       };
 
       // Create FormData for file upload
       const formData = new FormData();
       if (receiptFile) {
         formData.append('receipt', receiptFile);
+      }
+      if (messageFile) {
+        formData.append('messageFile', messageFile);
       }
       formData.append('orderData', JSON.stringify(orderData));
 
@@ -271,6 +335,19 @@ const Checkout = () => {
         // Clear cart
         localStorage.removeItem('cart');
         
+        // Get owner details for the first item (assuming all items are from the same owner)
+        if (response.data.data && response.data.data.length > 0) {
+          const order = response.data.data[0];
+          try {
+            const ownerResponse = await axiosInstance.get(`/user/${order.ownerId}`);
+            if (ownerResponse.data.success) {
+              setOwnerDetails(ownerResponse.data.data);
+            }
+          } catch (ownerErr) {
+            console.error('Error fetching owner details:', ownerErr);
+          }
+        }
+        
         // Show success message
         setShowOwnerContact(true);
         
@@ -283,7 +360,23 @@ const Checkout = () => {
       }
     } catch (err) {
       console.error('Error creating order:', err);
-      setError(err.response?.data?.message || 'Erreur lors de la création de la commande');
+      if (err.response) {
+        // Handle specific error messages from the backend
+        if (err.response.data && err.response.data.message) {
+          setError(err.response.data.message);
+        } else if (err.response.status === 400) {
+          setError('Données de commande invalides. Veuillez vérifier vos informations.');
+        } else if (err.response.status === 500) {
+          setError('Erreur serveur. Veuillez réessayer plus tard.');
+        } else {
+          setError('Erreur lors de la création de la commande');
+        }
+      } else if (err.request) {
+        // Network error
+        setError('Erreur de connexion. Veuillez vérifier votre connexion internet.');
+      } else {
+        setError('Erreur lors de la création de la commande');
+      }
     } finally {
       setLoading(false);
     }
@@ -672,33 +765,6 @@ const Checkout = () => {
                   </div>
                 </div>
               ))}
-
-              {/* Total Summary */}
-              <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Total de la commande</h3>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-500">Total pour la période</p>
-                    <p className="text-2xl font-bold text-blue-600">{total} MAD</p>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center mb-4">
-                  <p className="text-gray-600">Dépôt de garantie total (70%)</p>
-                  <p className="text-xl font-semibold text-blue-600">{deposit} MAD</p>
-                </div>
-                <div className="border-t border-blue-200 pt-4">
-                  <div className="flex justify-between items-center">
-                    <p className="text-lg font-semibold text-gray-800">Total à payer</p>
-                    <p className="text-2xl font-bold text-blue-600">{total + deposit} MAD</p>
-                  </div>
-                </div>
-                <div className="mt-4 p-4 bg-white rounded-lg border border-blue-200">
-                  <p className="text-sm text-gray-600 flex items-center">
-                    <Info className="h-4 w-4 mr-2 text-blue-500" />
-                    Le dépôt de garantie sera remboursé à la fin de la location si l'équipement est retourné en bon état.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -804,53 +870,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Message Section */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-          {/* Header with gradient background */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
-            <h2 className="text-xl font-semibold text-white flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2" />
-              Message au Propriétaire
-            </h2>
-            <p className="text-blue-100 text-sm mt-1">Ajoutez un message pour le propriétaire de l'équipement</p>
-          </div>
-
-          {/* Message Content */}
-          <div className="p-6">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Votre message
-                  </label>
-                  <textarea
-                    rows="4"
-                    className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                    placeholder="Ex: Bonjour, je souhaiterais des informations supplémentaires sur la disponibilité de l'équipement..."
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <Info className="h-4 w-4" />
-                    <span>Le message sera envoyé au propriétaire après la confirmation de la commande</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
-                      <Paperclip className="h-4 w-4 mr-2" />
-                      Joindre un fichier
-                    </button>
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center">
-                      <Send className="h-4 w-4 mr-2" />
-                      Envoyer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Confirm Order Button */}
         <div className="flex justify-end">
           <button
@@ -876,6 +895,26 @@ const Checkout = () => {
                 Votre commande a été enregistrée. Le propriétaire de l'équipement vous contactera bientôt pour confirmer la location.
               </p>
               
+              {ownerDetails && (
+                <div className="bg-blue-50 rounded-lg p-4 mb-4 text-left">
+                  <h4 className="font-medium text-blue-800 mb-2">Informations de contact du propriétaire:</h4>
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">Nom:</span> {ownerDetails.firstName} {ownerDetails.lastName}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">Email:</span> {ownerDetails.email}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">Téléphone:</span> {ownerDetails.phone}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              <p className="text-sm text-gray-500">
+                Vous serez redirigé vers la page d'accueil dans quelques secondes...
+              </p>
             </div>
           </div>
         </div>

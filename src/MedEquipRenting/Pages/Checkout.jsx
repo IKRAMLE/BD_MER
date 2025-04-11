@@ -243,6 +243,7 @@ const Checkout = () => {
         })),
         paymentMethod: selectedPayment,
         totalAmount: total,
+        deposit: deposit,
         personalInfo
       };
 
@@ -264,12 +265,12 @@ const Checkout = () => {
         // Clear cart
         localStorage.removeItem('cart');
         
-        // Show success message on the page
+        // Show success message
         setShowOwnerContact(true);
         
-        // Redirect to orders page after 5 seconds
+        // Redirect to home page after 5 seconds
         setTimeout(() => {
-          navigate('/orders');
+          navigate('/');
         }, 5000);
       } else {
         setError(response.data.message || 'Erreur lors de la création de la commande');
@@ -645,9 +646,6 @@ const Checkout = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-2">Commande créée avec succès!</h3>
               <p className="text-sm text-gray-500 mb-4">
                 Votre commande a été enregistrée. Le propriétaire de l'équipement vous contactera bientôt pour confirmer la location.
-              </p>
-              <p className="text-sm text-gray-500 mb-6">
-                Vous serez redirigé vers la page de vos commandes dans quelques secondes.
               </p>
               
             </div>

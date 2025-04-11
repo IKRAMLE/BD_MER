@@ -264,11 +264,13 @@ const Checkout = () => {
         // Clear cart
         localStorage.removeItem('cart');
         
-        // Show success message
-        alert('Commande créée avec succès! L\'équipement sera disponible après approbation du propriétaire.');
+        // Show success message on the page
+        setShowOwnerContact(true);
         
-        // Redirect to orders page
-        navigate('/orders');
+        // Redirect to orders page after 5 seconds
+        setTimeout(() => {
+          navigate('/orders');
+        }, 5000);
       } else {
         setError(response.data.message || 'Erreur lors de la création de la commande');
       }
@@ -630,6 +632,28 @@ const Checkout = () => {
           </button>
         </div>
       </div>
+
+      {showOwnerContact && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Commande créée avec succès!</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Votre commande a été enregistrée. Le propriétaire de l'équipement vous contactera bientôt pour confirmer la location.
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                Vous serez redirigé vers la page de vos commandes dans quelques secondes.
+              </p>
+              
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

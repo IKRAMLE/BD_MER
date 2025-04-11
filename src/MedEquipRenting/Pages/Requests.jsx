@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../utils/axiosConfig";
-import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList, Check, X, Clock } from "lucide-react";
+import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList, Check, X, Clock, Mail, Phone, MapPin } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../../MedEquipRenting/Components/Sidebar";
 import AuthenticationRequired from "../Components/AuthenticationRequired";
@@ -71,6 +71,7 @@ const Requests = () => {
           const firstItem = order.items && order.items[0];
           const equipment = firstItem?.equipmentId;
           const user = order.userId;
+          const personalInfo = order.personalInfo || {};
 
           if (!equipment) {
             console.warn('Order missing equipment data:', order);
@@ -82,8 +83,9 @@ const Requests = () => {
             equipmentId: equipment._id,
             equipmentName: equipment.name || 'Unknown Equipment',
             requesterId: user?._id,
-            requesterName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Unknown User',
-            requesterPhoto: user?.photo || "/api/placeholder/50/50",
+            requesterName: personalInfo.firstName && personalInfo.lastName 
+              ? `${personalInfo.firstName} ${personalInfo.lastName}`
+              : 'Utilisateur',
             status: order.status || 'pending',
             startDate: order.startDate || new Date().toISOString(),
             endDate: order.endDate || new Date().toISOString(),
@@ -91,7 +93,20 @@ const Requests = () => {
             totalPrice: order.totalAmount || 0,
             message: order.message || "Aucun message",
             createdAt: order.createdAt || new Date().toISOString(),
-            equipmentPhoto: equipment.photos?.[0] || "/api/placeholder/100/100"
+            equipmentPhoto: equipment.photos?.[0] || "/api/placeholder/100/100",
+            personalInfo: {
+              firstName: personalInfo.firstName || '',
+              lastName: personalInfo.lastName || '',
+              email: user?.email || personalInfo.email || '',
+              phone: personalInfo.phone || '',
+              address: personalInfo.address || '',
+              city: personalInfo.city || '',
+              country: personalInfo.country || '',
+              postalCode: personalInfo.postalCode || '',
+              cin: personalInfo.cin || '',
+              profession: personalInfo.profession || '',
+              organization: personalInfo.organization || ''
+            }
           };
         }).filter(request => request !== null); // Remove any null entries
 
@@ -244,11 +259,11 @@ const Requests = () => {
     return new Date(dateString).toLocaleDateString('fr-FR', options);
   };
 
-  // Format price with euro symbol
+  // Format price with Moroccan Dirham
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'MAD'
     }).format(price);
   };
 
@@ -521,115 +536,153 @@ const Requests = () => {
       {/* Request Details Modal */}
       {modalOpen && selectedRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-gray-800">Détails de la demande</h2>
-                <button 
-                  onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-6 w-6" />
-                </button>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full">
+            {/* Header with gradient background */}
+            <div className="relative h-24 bg-gradient-to-r from-blue-600 to-blue-800 rounded-t-2xl">
+              <div className="absolute -bottom-12 left-6 flex items-end space-x-3">
+                <div className="h-24 w-24 rounded-xl border-4 border-white shadow-lg overflow-hidden">
+                  <img 
+                    className="h-full w-full object-cover"
+                    src={selectedRequest.equipmentPhoto}
+                    alt={selectedRequest.equipmentName}
+                  />
+                </div>
+                <div className="mb-3">
+                  <h2 className="text-xl font-bold text-white mb-1">{selectedRequest.equipmentName}</h2>
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
+                      selectedRequest.status === "pending"
+                        ? "bg-amber-100 text-amber-800"
+                        : selectedRequest.status === "approved"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {selectedRequest.status === "pending"
+                      ? "En attente"
+                      : selectedRequest.status === "approved"
+                      ? "Approuvée"
+                      : "Refusée"}
+                  </span>
+                </div>
               </div>
+              <button 
+                onClick={closeModal}
+                className="absolute top-3 right-3 text-white hover:text-gray-200 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-3">Informations sur l'équipement</h3>
-                  <div className="flex mb-4">
-                    <div className="h-20 w-20 flex-shrink-0">
-                      <img 
-                        className="h-20 w-20 rounded-md object-cover" 
-                        src={selectedRequest.equipmentPhoto} 
-                        alt={selectedRequest.equipmentName} 
-                      />
+
+            <div className="p-6 pt-16">
+              {/* Main Content Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column - Equipment Details */}
+                <div className="lg:col-span-2 space-y-4">
+                  {/* Equipment Details Card */}
+                  <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                    <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                      <Package className="h-4 w-4 mr-2 text-blue-600" />
+                      Détails de l'équipement
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs text-gray-500">ID de l'équipement</p>
+                        <p className="text-sm font-medium">{selectedRequest.equipmentId}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Prix total</p>
+                        <p className="text-sm font-medium text-blue-600">{formatPrice(selectedRequest.totalPrice)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Période de location</p>
+                        <p className="text-sm font-medium">{formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Date de la demande</p>
+                        <p className="text-sm font-medium">{new Date(selectedRequest.createdAt).toLocaleString('fr-FR')}</p>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <p className="text-lg font-medium text-gray-900">{selectedRequest.equipmentName}</p>
-                      <p className="text-sm text-gray-500">ID: {selectedRequest.equipmentId}</p>
+                  </div>
+
+                  {/* Message Card */}
+                  <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                    <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                      <MessageSquare className="h-4 w-4 mr-2 text-blue-600" />
+                      Message du demandeur
+                    </h3>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-sm text-gray-700">{selectedRequest.message}</p>
                     </div>
                   </div>
                 </div>
-                
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-3">Informations sur le demandeur</h3>
-                  <div className="flex items-center mb-4">
-                    <div className="h-12 w-12 flex-shrink-0">
-                      <img 
-                        className="h-12 w-12 rounded-full object-cover" 
-                        src={selectedRequest.requesterPhoto} 
-                        alt={selectedRequest.requesterName} 
-                      />
+
+                {/* Right Column - Requester Details */}
+                <div className="space-y-4">
+                  {/* Requester Profile Card */}
+                  <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                    <div className="mb-4">
+                      <h3 className="text-base font-semibold text-gray-800">
+                        {selectedRequest.personalInfo.firstName} {selectedRequest.personalInfo.lastName}
+                      </h3>
+                      {selectedRequest.personalInfo.cin && (
+                        <p className="text-xs text-gray-500 mt-1">CIN: {selectedRequest.personalInfo.cin}</p>
+                      )}
                     </div>
-                    <div className="ml-4">
-                      <p className="text-md font-medium text-gray-900">{selectedRequest.requesterName}</p>
-                      <p className="text-sm text-gray-500">ID: {selectedRequest.requesterId}</p>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-xs">{selectedRequest.personalInfo.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-xs">{selectedRequest.personalInfo.phone}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-xs">{selectedRequest.personalInfo.address}, {selectedRequest.personalInfo.city}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Info Card */}
+                  <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                    <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                      <User className="h-4 w-4 mr-2 text-blue-600" />
+                      Informations supplémentaires
+                    </h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Profession</p>
+                        <p className="text-sm font-medium">{selectedRequest.personalInfo.profession}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Organisation</p>
+                        <p className="text-sm font-medium">{selectedRequest.personalInfo.organization}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3">Détails de la demande</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Période de location</p>
-                      <p className="font-medium">{formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Prix total</p>
-                      <p className="font-medium">{formatPrice(selectedRequest.totalPrice)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Date de la demande</p>
-                      <p className="font-medium">{new Date(selectedRequest.createdAt).toLocaleString('fr-FR')}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Statut</p>
-                      <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          selectedRequest.status === "pending"
-                            ? "bg-amber-100 text-amber-800"
-                            : selectedRequest.status === "approved"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {selectedRequest.status === "pending"
-                          ? "En attente"
-                          : selectedRequest.status === "approved"
-                          ? "Approuvée"
-                          : "Refusée"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-700 mb-3">Message du demandeur</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-700">{selectedRequest.message}</p>
-                </div>
-              </div>
-              
+
+              {/* Action Buttons */}
               {selectedRequest.status === "pending" && (
-                <div className="flex justify-end space-x-4 mt-6">
+                <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={() => handleReject(selectedRequest._id)}
                     disabled={loading}
-                    className="px-6 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    className="px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center text-sm"
                   >
+                    <X className="h-4 w-4 mr-1" />
                     Refuser
                   </button>
                   <button
                     onClick={() => handleApprove(selectedRequest._id)}
                     disabled={loading}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center text-sm"
                   >
+                    <Check className="h-4 w-4 mr-1" />
                     Approuver
                   </button>
                 </div>

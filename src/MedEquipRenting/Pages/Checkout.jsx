@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, CreditCard, Truck, Phone, AlertCircle, Upload, ArrowLeft } from 'lucide-react';
+import { Calendar, CreditCard, Truck, Phone, AlertCircle, Upload, ArrowLeft, User, Mail, IdCard, MapPin, MessageSquare, Info, Paperclip, Send } from 'lucide-react';
 import axiosInstance from '../../utils/axiosConfig';
 
 const paymentMethods = [
@@ -38,6 +38,7 @@ const Checkout = () => {
   const [personalInfo, setPersonalInfo] = useState({
     firstName: '',
     lastName: '',
+    email: '',
     cin: '',
     address: '',
     city: '',
@@ -188,7 +189,7 @@ const Checkout = () => {
 
   const validatePersonalInfo = () => {
     const errors = {};
-    const requiredFields = ['firstName', 'lastName', 'cin', 'address', 'city', 'phone'];
+    const requiredFields = ['firstName', 'lastName', 'email', 'cin', 'address', 'city', 'phone'];
     
     requiredFields.forEach(field => {
       if (!personalInfo[field]) {
@@ -196,9 +197,14 @@ const Checkout = () => {
       }
     });
 
+    // Validate email format
+    if (personalInfo.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personalInfo.email)) {
+      errors.email = 'Veuillez entrer une adresse email valide';
+    }
+
     // Validate phone number format
     if (personalInfo.phone && !/^[0-9]{10}$/.test(personalInfo.phone)) {
-      errors.phone = 'Le numéro de téléphone doit contenir 10 chiffres';
+      errors.phone = 'Veuillez entrer un numéro de téléphone valide (10 chiffres)';
     }
 
     setFieldErrors(errors);
@@ -360,267 +366,489 @@ const Checkout = () => {
         </div>
 
         {/* Personal Information Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-[#084b88] mb-4">Informations Personnelles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                Prénom <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={personalInfo.firstName}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.firstName ? 'border-red-500' : ''
-                }`}
-                required
-              />
-              {fieldErrors.firstName && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.firstName}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                Nom <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={personalInfo.lastName}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.lastName ? 'border-red-500' : ''
-                }`}
-                required
-              />
-              {fieldErrors.lastName && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.lastName}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                CIN <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="cin"
-                value={personalInfo.cin}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.cin ? 'border-red-500' : ''
-                }`}
-                required
-              />
-              {fieldErrors.cin && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.cin}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                Téléphone <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={personalInfo.phone}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.phone ? 'border-red-500' : ''
-                }`}
-                required
-                pattern="[0-9]{10}"
-                title="Veuillez entrer un numéro de téléphone valide (10 chiffres)"
-              />
-              {fieldErrors.phone && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.phone}</p>
-              )}
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                Adresse <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={personalInfo.address}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.address ? 'border-red-500' : ''
-                }`}
-                required
-              />
-              {fieldErrors.address && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.address}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#4e4942] mb-1">
-                Ville <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={personalInfo.city}
-                onChange={handlePersonalInfoChange}
-                className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#0070cc] focus:border-transparent ${
-                  fieldErrors.city ? 'border-red-500' : ''
-                }`}
-                required
-              />
-              {fieldErrors.city && (
-                <p className="text-red-500 text-sm mt-1">{fieldErrors.city}</p>
-              )}
-            </div>
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <User className="h-5 w-5 mr-2" />
+              Informations Personnelles
+            </h2>
+            <p className="text-blue-100 text-sm mt-1">Veuillez remplir vos informations pour finaliser la commande</p>
           </div>
-          <div className="mt-4 text-sm text-[#7d7469]">
-            <p><span className="text-red-500">*</span> Champs obligatoires</p>
-          </div>
-        </div>
 
-        {/* Equipment Summary */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-[#084b88] mb-4">Récapitulatif de la Location</h2>
-          {cartItems.map(item => (
-            <div key={item._id} className="border-b border-gray-200 py-4">
-              <div className="flex gap-4">
-                <img
-                  src={`http://localhost:5000${item.image}`}
-                  alt={item.name}
-                  className="w-24 h-24 rounded-lg object-cover"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
+          {/* Form Content */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+                    <User className="h-4 w-4 mr-2 text-blue-600" />
+                    Informations de Base
+                  </h3>
+                  <div className="space-y-4">
                     <div>
-                      <h3 className="font-medium text-[#084b88]">{item.name}</h3>
-                      <p className="text-sm text-[#7d7469]">Quantité: {item.quantity}</p>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Prénom <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={personalInfo.firstName}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="Entrez votre prénom"
+                      />
+                      {fieldErrors.firstName && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.firstName}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Nom <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={personalInfo.lastName}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="Entrez votre nom"
+                      />
+                      {fieldErrors.lastName && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.lastName}
+                        </p>
+                      )}
                     </div>
                   </div>
+                </div>
 
-                  <div className="mt-4 flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-[#0070cc]" />
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="number"
-                          min="1"
-                          value={customPeriods[item._id] || 1}
-                          onChange={(e) => handleCustomPeriodChange(item._id, e.target.value)}
-                          className="w-16 border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
-                        />
-                        <select
-                          value={periodTypes[item._id] || item.rentalPeriod || 'day'}
-                          onChange={(e) => handlePeriodTypeChange(item._id, e.target.value)}
-                          className="border border-[#bae0fd] rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#0070cc]"
-                        >
-                          <option value="day">Jours</option>
-                          <option value="month">Mois</option>
-                        </select>
-                      </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+                    <Mail className="h-4 w-4 mr-2 text-blue-600" />
+                    Contact
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={personalInfo.email}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="votre@email.com"
+                      />
+                      {fieldErrors.email && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.email}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Téléphone <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={personalInfo.phone}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        pattern="[0-9]{10}"
+                        placeholder="06XXXXXXXX"
+                      />
+                      {fieldErrors.phone && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="mt-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#7d7469]">Prix par {getPeriodText(item)}:</span>
-                      <span className="font-medium text-[#084b88]">{item.price} MAD</span>
+              {/* Right Column */}
+              <div className="space-y-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+                    <IdCard className="h-4 w-4 mr-2 text-blue-600" />
+                    Identité
+                  </h3>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      CIN <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="cin"
+                      value={personalInfo.cin}
+                      onChange={handlePersonalInfoChange}
+                      className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        fieldErrors.cin ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
+                      required
+                      placeholder="Entrez votre numéro CIN"
+                    />
+                    {fieldErrors.cin && (
+                      <p className="text-red-500 text-xs mt-1 flex items-center">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        {fieldErrors.cin}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+                    <MapPin className="h-4 w-4 mr-2 text-blue-600" />
+                    Adresse
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Adresse <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={personalInfo.address}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.address ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="Entrez votre adresse complète"
+                      />
+                      {fieldErrors.address && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.address}
+                        </p>
+                      )}
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#7d7469]">Prix pour la période:</span>
-                      <span className="font-medium text-[#084b88]">
-                        {calculateItemTotal(item)} MAD
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#7d7469]">Dépôt de garantie (70%):</span>
-                      <span className="font-medium text-[#084b88]">{calculateDeposit(item)} MAD</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Ville <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={personalInfo.city}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.city ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="Entrez votre ville"
+                      />
+                      {fieldErrors.city && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.city}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-[#084b88]">Total pour la période</span>
-                <span className="font-bold text-[#084b88]">{total} MAD</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-[#084b88]">Dépôt de garantie total (70%)</span>
-                <span className="font-bold text-[#084b88]">{deposit} MAD</span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                <span className="font-bold text-lg text-[#084b88]">Total à payer</span>
-                <span className="font-bold text-lg text-[#084b88]">{total + deposit} MAD</span>
-              </div>
+
+            {/* Required Fields Note */}
+            <div className="mt-6 text-sm text-gray-500 flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2 text-blue-600" />
+              <span>Les champs marqués d'un <span className="text-red-500">*</span> sont obligatoires</span>
             </div>
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-[#084b88]">
-                Le dépôt de garantie sera remboursé à la fin de la location si l'équipement est retourné en bon état.
-                En cas de non-retour ou de dommages, le propriétaire conservera le dépôt.
-              </p>
+          </div>
+        </div>
+
+        {/* Equipment Summary */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <Calendar className="h-5 w-5 mr-2" />
+              Récapitulatif de la Location
+            </h2>
+            <p className="text-blue-100 text-sm mt-1">Vérifiez les détails de votre location</p>
+          </div>
+
+          {/* Summary Content */}
+          <div className="p-6">
+            <div className="space-y-6">
+              {cartItems.map(item => (
+                <div key={item._id} className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition-all">
+                  <div className="flex gap-6">
+                    {/* Equipment Image */}
+                    <div className="relative">
+                      <img
+                        src={`http://localhost:5000${item.image}`}
+                        alt={item.name}
+                        className="w-32 h-32 rounded-xl object-cover shadow-md"
+                      />
+                      <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full">
+                        x{item.quantity}
+                      </div>
+                    </div>
+
+                    {/* Equipment Details */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+                          <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-500">Prix par {getPeriodText(item)}</p>
+                          <p className="text-lg font-semibold text-blue-600">{item.price} MAD</p>
+                        </div>
+                      </div>
+
+                      {/* Rental Period Selection */}
+                      <div className="bg-white rounded-lg p-4 mb-4 border border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <Calendar className="h-5 w-5 text-blue-500" />
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="number"
+                                min="1"
+                                value={customPeriods[item._id] || 1}
+                                onChange={(e) => handleCustomPeriodChange(item._id, e.target.value)}
+                                className="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                              <select
+                                value={periodTypes[item._id] || item.rentalPeriod || 'day'}
+                                onChange={(e) => handlePeriodTypeChange(item._id, e.target.value)}
+                                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              >
+                                <option value="day">Jours</option>
+                                <option value="month">Mois</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-500">Total période</p>
+                            <p className="text-lg font-semibold text-blue-600">{calculateItemTotal(item)} MAD</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Price Breakdown */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                          <p className="text-sm text-gray-500 mb-1">Dépôt de garantie</p>
+                          <p className="text-lg font-semibold text-blue-600">{calculateDeposit(item)} MAD</p>
+                          <p className="text-xs text-gray-400 mt-1">70% du prix total</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                          <p className="text-sm text-gray-500 mb-1">Total à payer</p>
+                          <p className="text-lg font-semibold text-blue-600">{calculateItemTotal(item) + calculateDeposit(item)} MAD</p>
+                          <p className="text-xs text-gray-400 mt-1">Inclut le dépôt</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Total Summary */}
+              <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Total de la commande</h3>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Total pour la période</p>
+                    <p className="text-2xl font-bold text-blue-600">{total} MAD</p>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-gray-600">Dépôt de garantie total (70%)</p>
+                  <p className="text-xl font-semibold text-blue-600">{deposit} MAD</p>
+                </div>
+                <div className="border-t border-blue-200 pt-4">
+                  <div className="flex justify-between items-center">
+                    <p className="text-lg font-semibold text-gray-800">Total à payer</p>
+                    <p className="text-2xl font-bold text-blue-600">{total + deposit} MAD</p>
+                  </div>
+                </div>
+                <div className="mt-4 p-4 bg-white rounded-lg border border-blue-200">
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <Info className="h-4 w-4 mr-2 text-blue-500" />
+                    Le dépôt de garantie sera remboursé à la fin de la location si l'équipement est retourné en bon état.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Payment Method */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold text-[#084b88] mb-4">Méthode de Paiement</h2>
-          <div className="space-y-4">
-            {paymentMethods.map(method => (
-              <div
-                key={method.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                  selectedPayment === method.id
-                    ? 'border-[#0070cc] bg-blue-50'
-                    : 'border-gray-200 hover:border-[#0070cc]'
-                }`}
-                onClick={() => setSelectedPayment(method.id)}
-              >
-                <div className="flex items-center">
-                  <input
-                    type="radio"
-                    name="payment"
-                    id={method.id}
-                    checked={selectedPayment === method.id}
-                    onChange={() => setSelectedPayment(method.id)}
-                    className="mr-3"
-                  />
-                  <div>
-                    <label htmlFor={method.id} className="font-medium text-[#084b88]">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <CreditCard className="h-5 w-5 mr-2" />
+              Méthode de Paiement
+            </h2>
+            <p className="text-blue-100 text-sm mt-1">Choisissez votre méthode de paiement préférée</p>
+          </div>
+
+          {/* Payment Methods Grid */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {paymentMethods.map(method => (
+                <div
+                  key={method.id}
+                  onClick={() => setSelectedPayment(method.id)}
+                  className={`relative group cursor-pointer transition-all duration-300 ${
+                    selectedPayment === method.id
+                      ? 'ring-2 ring-blue-500 scale-[1.02]'
+                      : 'hover:scale-[1.01]'
+                  }`}
+                >
+                  <div className={`rounded-xl p-6 h-full ${
+                    selectedPayment === method.id
+                      ? 'bg-blue-50 border-2 border-blue-500'
+                      : 'bg-gray-50 border border-gray-200 hover:border-blue-300'
+                  }`}>
+                    {/* Payment Method Icon */}
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+                      selectedPayment === method.id
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white text-blue-500 group-hover:bg-blue-100'
+                    }`}>
+                      {method.id === 'bank' && <CreditCard className="h-6 w-6" />}
+                      {method.id === 'wafacash' && <Truck className="h-6 w-6" />}
+                      {method.id === 'cashplus' && <Phone className="h-6 w-6" />}
+                    </div>
+
+                    {/* Payment Method Name */}
+                    <h3 className={`font-semibold mb-2 ${
+                      selectedPayment === method.id
+                        ? 'text-blue-700'
+                        : 'text-gray-700 group-hover:text-blue-600'
+                    }`}>
                       {method.name}
+                    </h3>
+
+                    {/* Payment Method Description */}
+                    <p className="text-sm text-gray-500 mb-4">
+                      {method.description}
+                    </p>
+
+                    {/* Selection Indicator */}
+                    <div className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedPayment === method.id
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300 group-hover:border-blue-300'
+                    }`}>
+                      {selectedPayment === method.id && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Payment Receipt Upload Section */}
+            {selectedPayment && selectedPayment !== 'cash' && (
+              <div className="mt-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-700 mb-1">Preuve de Paiement</h3>
+                    <p className="text-sm text-gray-500">Téléchargez votre reçu de paiement</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
+                      <Upload className="h-5 w-5 mr-2" />
+                      <span>Choisir un fichier</span>
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={handleReceiptUpload}
+                        className="hidden"
+                      />
                     </label>
-                    <p className="text-sm text-[#7d7469]">{method.description}</p>
+                    {receiptFile && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        {receiptFile.name}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
+            )}
+          </div>
+        </div>
+
+        {/* Message Section */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Message au Propriétaire
+            </h2>
+            <p className="text-blue-100 text-sm mt-1">Ajoutez un message pour le propriétaire de l'équipement</p>
           </div>
 
-          {selectedPayment && selectedPayment !== 'cash' && (
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-[#4e4942] mb-2">
-                Télécharger le reçu de paiement *
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center px-4 py-2 bg-[#0070cc] text-white rounded-lg cursor-pointer hover:bg-[#005fa3] transition-colors">
-                  <Upload className="h-5 w-5 mr-2" />
-                  <span>Choisir un fichier</span>
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={handleReceiptUpload}
-                    className="hidden"
+          {/* Message Content */}
+          <div className="p-6">
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Votre message
+                  </label>
+                  <textarea
+                    rows="4"
+                    className="w-full p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                    placeholder="Ex: Bonjour, je souhaiterais des informations supplémentaires sur la disponibilité de l'équipement..."
                   />
-                </label>
-                {receiptFile && (
-                  <span className="text-sm text-[#4e4942]">{receiptFile.name}</span>
-                )}
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <Info className="h-4 w-4" />
+                    <span>Le message sera envoyé au propriétaire après la confirmation de la commande</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                      <Paperclip className="h-4 w-4 mr-2" />
+                      Joindre un fichier
+                    </button>
+                    <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center">
+                      <Send className="h-4 w-4 mr-2" />
+                      Envoyer
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Confirm Order Button */}

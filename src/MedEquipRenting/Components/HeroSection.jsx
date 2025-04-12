@@ -56,17 +56,9 @@ const HeroSection = () => {
             }`}
           >
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Rechercher un équipement..."
-                className="w-full px-6 py-4 pr-12 bg-white shadow-lg rounded-full border border-gray-100 focus:ring-2 focus:ring-[#108de4] focus:border-transparent focus:outline-none"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+         
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <button className="p-2 bg-[#108de4] text-white rounded-full hover:bg-[#0070cc] transition-colors">
-                  <Search size={20} />
-                </button>
+               
               </div>
             </div>
           </div>

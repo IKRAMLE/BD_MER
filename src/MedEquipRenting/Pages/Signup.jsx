@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Phone, ArrowLeft } from 'lucide-react';
 
 const CreateAccount = () => {
   const [formData, setFormData] = useState({
@@ -24,6 +24,10 @@ const CreateAccount = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleReturn = () => {
+    navigate('/');
   };
 
   const validateForm = () => {
@@ -118,6 +122,13 @@ const CreateAccount = () => {
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-[#f0f7ff]">
         <div className="max-w-2xl mx-auto">
+        <button
+            onClick={handleReturn}
+            className="flex items-center text-[#0070cc] hover:text-[#0058a6] -ml-40 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            Retour
+          </button>
           <div className="bg-white shadow-xl rounded-2xl p-6">
             {success ? (
               <div className="text-center py-10">

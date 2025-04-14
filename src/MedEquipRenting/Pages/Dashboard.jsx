@@ -109,9 +109,8 @@ const Dashboard = () => {
 
   const menuItems = [
     { icon: Compass, text: "Tableau de bord", path: "/dashboard" },
-    { icon: Package, text: "Mon Équipement", path: "/my-equipment" },
+    { icon: Package, text: "Location d'équipement", path: "/rent-equip" },
     { icon: ClipboardList, text: "Demandes", path: "/requests" },
-    { icon: MessageSquare, text: "Messages", path: "/chat" },
     { icon: Heart, text: "Favoris", path: "/favorites" },
     { icon: User, text: "Profil", path: "/profile" },
     { icon: Settings, text: "Paramètres", path: "/settings" },

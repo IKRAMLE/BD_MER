@@ -35,6 +35,7 @@ const Checkout = () => {
   const [total, setTotal] = useState(0);
   const [deposit, setDeposit] = useState(0);
   const [receiptFile, setReceiptFile] = useState(null);
+  const [cinFile, setCinFile] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     firstName: '',
     lastName: '',
@@ -192,6 +193,27 @@ const Checkout = () => {
     }
   };
 
+  const handleCinUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setFieldErrors(prev => ({
+          ...prev,
+          cinFile: 'Le fichier ne doit pas dépasser 5MB'
+        }));
+        return;
+      }
+      setCinFile(file);
+      // Clear error when file is uploaded
+      if (fieldErrors.cinFile) {
+        setFieldErrors(prev => ({
+          ...prev,
+          cinFile: ''
+        }));
+      }
+    }
+  };
+
   const validatePersonalInfo = () => {
     const errors = {};
     const requiredFields = ['firstName', 'lastName', 'email', 'cin', 'address', 'city', 'phone'];
@@ -201,6 +223,10 @@ const Checkout = () => {
         errors[field] = 'Ce champ est obligatoire';
       }
     });
+
+    if (!cinFile) {
+      errors.cinFile = 'Le document CIN est obligatoire';
+    }
 
     // Validate email format
     if (personalInfo.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personalInfo.email)) {
@@ -289,11 +315,6 @@ const Checkout = () => {
       return;
     }
 
-    if (selectedPayment !== 'cash' && !receiptFile) {
-      setError('Veuillez télécharger le reçu de paiement');
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
@@ -316,11 +337,11 @@ const Checkout = () => {
 
       // Create FormData for file upload
       const formData = new FormData();
-      if (receiptFile) {
-        formData.append('receipt', receiptFile);
-      }
       if (messageFile) {
         formData.append('messageFile', messageFile);
+      }
+      if (cinFile) {
+        formData.append('cinFile', cinFile);
       }
       formData.append('orderData', JSON.stringify(orderData));
 
@@ -589,27 +610,61 @@ const Checkout = () => {
                     <IdCard className="h-4 w-4 mr-2 text-blue-600" />
                     Identité
                   </h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      CIN <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="cin"
-                      value={personalInfo.cin}
-                      onChange={handlePersonalInfoChange}
-                      className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        fieldErrors.cin ? 'border-red-500 bg-red-50' : 'border-gray-200'
-                      }`}
-                      required
-                      placeholder="Entrez votre numéro CIN"
-                    />
-                    {fieldErrors.cin && (
-                      <p className="text-red-500 text-xs mt-1 flex items-center">
-                        <AlertCircle className="h-3 w-3 mr-1" />
-                        {fieldErrors.cin}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        CIN <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="cin"
+                        value={personalInfo.cin}
+                        onChange={handlePersonalInfoChange}
+                        className={`w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          fieldErrors.cin ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                        }`}
+                        required
+                        placeholder="Entrez votre numéro CIN"
+                      />
+                      {fieldErrors.cin && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.cin}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
+                        Document CIN <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <label className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
+                          <Upload className="h-5 w-5 mr-2" />
+                          <span>Choisir un fichier</span>
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            onChange={handleCinUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        {cinFile && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            {cinFile.name}
+                          </div>
+                        )}
+                      </div>
+                      {fieldErrors.cinFile && (
+                        <p className="text-red-500 text-xs mt-1 flex items-center">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          {fieldErrors.cinFile}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Formats acceptés : JPG, PNG, PDF. Taille maximale : 5MB
                       </p>
-                    )}
+                    </div>
                   </div>
                 </div>
 
@@ -837,36 +892,6 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
-
-            {/* Payment Receipt Upload Section */}
-            {selectedPayment && selectedPayment !== 'cash' && (
-              <div className="mt-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-700 mb-1">Preuve de Paiement</h3>
-                    <p className="text-sm text-gray-500">Téléchargez votre reçu de paiement</p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
-                      <Upload className="h-5 w-5 mr-2" />
-                      <span>Choisir un fichier</span>
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        onChange={handleReceiptUpload}
-                        className="hidden"
-                      />
-                    </label>
-                    {receiptFile && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                        {receiptFile.name}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

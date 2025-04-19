@@ -349,16 +349,24 @@ const Checkout = () => {
 
       // Prepare order data
       const orderData = {
-        items: cartItems.map(item => ({
-          equipmentId: item._id,
-          quantity: item.quantity,
-          rentalDays: calculateMonths(rentalDates[item._id].startDate, rentalDates[item._id].endDate),
-          price: calculateItemTotal(item) + calculateDeposit(item), // Total à payer (prix + dépôt)
-          rentalPeriod: 'month'
-        })),
+        items: cartItems.map(item => {
+          const months = calculateMonths(rentalDates[item._id].startDate, rentalDates[item._id].endDate);
+          const itemTotal = calculateItemTotal(item);
+          const itemDeposit = calculateDeposit(item);
+          
+          return {
+            equipmentId: item._id,
+            quantity: item.quantity,
+            startDate: rentalDates[item._id].startDate,
+            endDate: rentalDates[item._id].endDate,
+            rentalDays: months, // Nombre de mois
+            rentalPeriod: 'month', // Type de période fixé à 'month'
+            price: itemTotal + itemDeposit // Prix total incluant le dépôt
+          };
+        }),
         paymentMethod: selectedPayment,
-        totalAmount: total + deposit, // Total à payer pour toute la commande
-        deposit: deposit,
+        totalAmount: Number(total + deposit), // Conversion explicite en nombre
+        deposit: Number(deposit), // Conversion explicite en nombre
         personalInfo,
         message: message || "Aucun message"
       };

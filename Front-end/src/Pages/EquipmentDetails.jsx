@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../utils/axiosConfig";
+import axiosInstance from "../utils/axiosConfig";
 import { ArrowLeft, Package, MapPin, Calendar, Tag, Star, Clock, Shield } from "lucide-react";
 
 const API_URL = 'http://localhost:5000';

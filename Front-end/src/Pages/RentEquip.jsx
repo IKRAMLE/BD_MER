@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import FiltringSidebar from '../Components/FiltringSidebar';
-import axiosInstance from '../../utils/axiosConfig';
+import axiosInstance from '../utils/axiosConfig';
 import { Heart } from 'lucide-react';
 
 function RentEquip() {

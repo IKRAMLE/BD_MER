@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axiosInstance from "../../utils/axiosConfig";
+import axiosInstance from "../utils/axiosConfig";
 import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList, Check, X, Clock, Mail, Phone, MapPin, Paperclip, Search, Filter, Calendar, DollarSign, ChevronRight, ChevronDown, ChevronUp, Star, Award, AlertCircle, Info } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
-import Sidebar from "../../MedEquipRenting/Components/Sidebar";
+import Sidebar from "../Components/Sidebar";
 import AuthenticationRequired from "../Components/AuthenticationRequired";
 
 const Requests = () => {

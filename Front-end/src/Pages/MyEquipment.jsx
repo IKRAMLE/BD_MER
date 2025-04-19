@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../utils/axiosConfig";
+import axiosInstance from "../utils/axiosConfig";
 import { Package, Edit, Trash2, Plus, Compass, User, Heart, Settings, MessageSquare, ClipboardList } from "lucide-react";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";

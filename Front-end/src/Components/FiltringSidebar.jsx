@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../utils/axiosConfig";
+import axiosInstance from "../utils/axiosConfig";
 
 function FilteringSidebar({ onFilterChange }) {
   const [category, setCategory] = useState("");

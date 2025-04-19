@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Search, Filter, AlertCircle } from 'lucide-react';
-import axiosInstance from '../../utils/axiosConfig';
+import axiosInstance from '../utils/axiosConfig';
 
 const Favoris = () => {
   const navigate = useNavigate();

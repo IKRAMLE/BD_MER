@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, CreditCard, Truck, Phone, AlertCircle, Upload, ArrowLeft, User, Mail, IdCard, MapPin, MessageSquare, Info, Paperclip, Send } from 'lucide-react';
-import axiosInstance from '../../utils/axiosConfig';
+import axiosInstance from "../utils/axiosConfig";
 
 const paymentMethods = [
   {

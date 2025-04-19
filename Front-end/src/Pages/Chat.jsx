@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Send, ArrowLeft } from 'lucide-react';
-import axiosInstance from '../../utils/axiosConfig';
+import axiosInstance from '../utils/axiosConfig';
 
 const Chat = () => {
   const { userId } = useParams();

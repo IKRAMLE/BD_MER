@@ -31,6 +31,7 @@ const Requests = () => {
   const [sortBy, setSortBy] = useState("date"); 
   const [sortOrder, setSortOrder] = useState("desc"); 
   const [expandedFilters, setExpandedFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState('details');
 
   useEffect(() => {
     // Check if user is logged in
@@ -108,6 +109,7 @@ const Requests = () => {
               country: personalInfo.country || '',
               postalCode: personalInfo.postalCode || '',
               cin: personalInfo.cin || '',
+              cinProof: order.cinProof || '',
               profession: personalInfo.profession || '',
               organization: personalInfo.organization || ''
             }
@@ -776,118 +778,159 @@ const Requests = () => {
 
             <div className="p-4 pt-12">
               {/* Tabs Navigation */}
-              <div className="flex mb-4">
-                <button className="px-4 py-2 text-sm font-medium text-[#07447d] border-b-2 border-[#07447d]">
+              <div className="flex mb-4 border-b border-gray-200">
+                <button 
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'details' 
+                      ? 'text-[#07447d] border-b-2 border-[#07447d]' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setActiveTab('details')}
+                >
                   Détails
                 </button>
-                <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                <button 
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'requester' 
+                      ? 'text-[#07447d] border-b-2 border-[#07447d]' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setActiveTab('requester')}
+                >
                   Demandeur
                 </button>
-                <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                <button 
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'message' 
+                      ? 'text-[#07447d] border-b-2 border-[#07447d]' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setActiveTab('message')}
+                >
                   Message
                 </button>
               </div>
 
               {/* Main Content */}
               <div className="space-y-4">
-                {/* Equipment Details */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
-                    <p className="text-xs text-gray-500">ID de l'équipement</p>
-                    <p className="text-sm font-medium">{selectedRequest.equipmentId}</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
-                    <p className="text-xs text-gray-500">Prix total</p>
-                    <p className="text-sm font-medium text-[#07447d]">{formatPrice(selectedRequest.totalPrice)}</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
-                    <p className="text-xs text-gray-500">Période de location</p>
-                    <div className="flex items-center mb-2">
-                      <Calendar size={16} className="mr-2 text-gray-500" />
-                      <div>
-                      
-                        <p className="text-sm font-medium">
-                          {formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                            {calculateRentalDuration(selectedRequest.startDate, selectedRequest.endDate)} jours
-                          </span>
-                        </p>
-                      </div>
+                {/* Equipment Details Tab */}
+                {activeTab === 'details' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-gray-500">ID de l'équipement</p>
+                      <p className="text-sm font-medium">{selectedRequest.equipmentId}</p>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
-                    <p className="text-xs text-gray-500">Date de la demande</p>
-                    <p className="text-sm font-medium">{new Date(selectedRequest.createdAt).toLocaleString('fr-FR')}</p>
-                  </div>
-                </div>
-
-                {/* Requester Info */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg shadow-sm">
-                  <div className="flex items-center mb-2">
-                    <div className="bg-white p-1.5 rounded-full mr-2 shadow-sm">
-                      <User className="h-3.5 w-3.5 text-[#07447d]" />
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-gray-500">Prix total</p>
+                      <p className="text-sm font-medium text-[#07447d]">{formatPrice(selectedRequest.totalPrice)}</p>
                     </div>
-                    <h3 className="text-sm font-semibold text-gray-800">
-                      {selectedRequest.personalInfo.firstName} {selectedRequest.personalInfo.lastName}
-                    </h3>
-                    {selectedRequest.personalInfo.cin && (
-                      <span className="ml-2 text-xs text-gray-500">CIN: {selectedRequest.personalInfo.cin}</span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center">
-                      <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
-                        <Mail className="h-3 w-3 text-[#07447d]" />
-                      </div>
-                      <span>{selectedRequest.personalInfo.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
-                        <Phone className="h-3 w-3 text-[#07447d]" />
-                      </div>
-                      <span>{selectedRequest.personalInfo.phone}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
-                        <MapPin className="h-3 w-3 text-[#07447d]" />
-                      </div>
-                      <span>{selectedRequest.personalInfo.address}, {selectedRequest.personalInfo.city}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
-                        <Info className="h-3 w-3 text-[#07447d]" />
-                      </div>
-                      <span>{selectedRequest.personalInfo.profession} - {selectedRequest.personalInfo.organization}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Message */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 shadow-sm">
-                  <div className="flex items-start">
-                    <div className="bg-white p-1.5 rounded-full mr-2 shadow-sm">
-                      <MessageSquare className="h-3.5 w-3.5 text-[#07447d]" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-700 whitespace-pre-line">{selectedRequest.message || "Aucun message"}</p>
-                      {selectedRequest.messageFile && (
-                        <div className="mt-2 flex items-center">
-                          <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
-                            <Paperclip className="h-3 w-3 text-[#07447d]" />
-                          </div>
-                          <a 
-                            href={`http://localhost:5000${selectedRequest.messageFile}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-xs text-[#07447d] hover:underline"
-                          >
-                            Pièce jointe
-                          </a>
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-gray-500">Période de location</p>
+                      <div className="flex items-center mb-2">
+                        <Calendar size={16} className="mr-2 text-gray-500" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            {formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}
+                            <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                              {calculateRentalDuration(selectedRequest.startDate, selectedRequest.endDate)} jours
+                            </span>
+                          </p>
                         </div>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
+                      <p className="text-xs text-gray-500">Date de la demande</p>
+                      <p className="text-sm font-medium">{new Date(selectedRequest.createdAt).toLocaleString('fr-FR')}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Requester Details Tab */}
+                {activeTab === 'requester' && (
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg shadow-sm">
+                    <div className="flex items-center mb-2">
+                      <div className="bg-white p-1.5 rounded-full mr-2 shadow-sm">
+                        <User className="h-3.5 w-3.5 text-[#07447d]" />
+                      </div>
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        {selectedRequest.personalInfo.firstName} {selectedRequest.personalInfo.lastName}
+                      </h3>
+                      {selectedRequest.personalInfo.cin && (
+                        <span className="ml-2 text-xs text-gray-500">CIN: {selectedRequest.personalInfo.cin}</span>
                       )}
                     </div>
+                    {selectedRequest.personalInfo.cinProof && (
+                      <div className="mt-2 flex items-center">
+                        <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                          <Paperclip className="h-3 w-3 text-[#07447d]" />
+                        </div>
+                        <a 
+                          href={`http://localhost:5000${selectedRequest.personalInfo.cinProof}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-[#07447d] hover:underline"
+                        >
+                          Preuve CIN
+                        </a>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+                      <div className="flex items-center">
+                        <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                          <Mail className="h-3 w-3 text-[#07447d]" />
+                        </div>
+                        <span>{selectedRequest.personalInfo.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                          <Phone className="h-3 w-3 text-[#07447d]" />
+                        </div>
+                        <span>{selectedRequest.personalInfo.phone}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                          <MapPin className="h-3 w-3 text-[#07447d]" />
+                        </div>
+                        <span>{selectedRequest.personalInfo.address}, {selectedRequest.personalInfo.city}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                          <Info className="h-3 w-3 text-[#07447d]" />
+                        </div>
+                        <span>{selectedRequest.personalInfo.profession} - {selectedRequest.personalInfo.organization}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* Message Tab */}
+                {activeTab === 'message' && (
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 shadow-sm">
+                    <div className="flex items-start">
+                      <div className="bg-white p-1.5 rounded-full mr-2 shadow-sm">
+                        <MessageSquare className="h-3.5 w-3.5 text-[#07447d]" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-700 whitespace-pre-line">{selectedRequest.message || "Aucun message"}</p>
+                        {selectedRequest.messageFile && (
+                          <div className="mt-2 flex items-center">
+                            <div className="bg-white p-1 rounded-full mr-1 shadow-sm">
+                              <Paperclip className="h-3 w-3 text-[#07447d]" />
+                            </div>
+                            <a 
+                              href={`http://localhost:5000${selectedRequest.messageFile}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-xs text-[#07447d] hover:underline"
+                            >
+                              Pièce jointe
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}

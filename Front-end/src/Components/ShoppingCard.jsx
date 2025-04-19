@@ -23,7 +23,8 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
   // Handle quantity update with fallback if no function is provided
   const handleQuantityUpdate = (itemId, newQuantity) => {
     if (updateCartItemQuantity) {
-      updateCartItemQuantity(itemId, newQuantity);
+      // Limiter la quantité entre 1 et 1 (donc toujours 1)
+      updateCartItemQuantity(itemId, 1);
     }
   };
   
@@ -131,14 +132,14 @@ const ShoppingCart = ({ isOpen, onClose, cartItems = [], removeFromCart, updateC
                         <div className="flex items-center bg-white rounded-full border border-gray-200">
                           <button 
                             className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100"
-                            onClick={() => handleQuantityUpdate(item.id, Math.max(1, item.quantity - 1))}
+                            onClick={() => handleQuantityUpdate(item.id, 1)}
                           >
                             -
                           </button>
-                          <span className="mx-2 text-sm font-medium">{item.quantity}</span>
+                          <span className="mx-2 text-sm font-medium">1</span>
                           <button 
                             className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100"
-                            onClick={() => handleQuantityUpdate(item.id, item.quantity + 1)}
+                            onClick={() => handleQuantityUpdate(item.id, 1)}
                           >
                             +
                           </button>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import FiltringSidebar from '../Components/FiltringSidebar';
 import axiosInstance from '../utils/axiosConfig';
-import { Heart } from 'lucide-react';
+import { Heart, AlertCircle } from 'lucide-react';
 
 function RentEquip() {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ function RentEquip() {
   const [filteredEquipment, setFilteredEquipment] = useState([]);
   const [favorites, setFavorites] = useState(new Set());
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
   // Fetch equipment data from backend
   useEffect(() => {
@@ -101,40 +102,53 @@ function RentEquip() {
     // Check if item already exists
     const existingItem = existingCart.find(cartItem => cartItem.id === item._id);
     
-    let newCart;
     if (existingItem) {
-      // Update quantity if item exists
-      newCart = existingCart.map(cartItem =>
-        cartItem.id === item._id
-          ? { 
-              ...cartItem, 
-              quantity: cartItem.quantity + 1,
-              days: item.rentalPeriod === 'month' ? 30 : 7, // Set default period based on rentalPeriod
-              rentalPeriod: item.rentalPeriod // Store the rental period type
-            }
-          : cartItem
-      );
-    } else {
-      // Add new item with all necessary details
-      newCart = [...existingCart, {
-        id: item._id,
-        name: item.name,
-        price: item.price,
-        image: item.image ? `http://localhost:5000${item.image}` : '/api/placeholder/100/100',
-        days: item.rentalPeriod === 'month' ? 30 : 7, // Set default period based on rentalPeriod
-        rentalPeriod: item.rentalPeriod, // Store the rental period type
-        quantity: 1,
-        description: item.description,
-        category: item.category,
-        condition: item.condition
-      }];
+      // Show notification that item is already in cart
+      setNotification({
+        show: true,
+        message: 'Cet équipement est déjà dans votre panier',
+        type: 'warning'
+      });
+      
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      
+      return;
     }
+    
+    // Add new item with all necessary details
+    const newCart = [...existingCart, {
+      id: item._id,
+      name: item.name,
+      price: item.price,
+      image: item.image ? `http://localhost:5000${item.image}` : '/api/placeholder/100/100',
+      days: item.rentalPeriod === 'month' ? 30 : 7,
+      rentalPeriod: item.rentalPeriod,
+      quantity: 1,
+      description: item.description,
+      category: item.category,
+      condition: item.condition
+    }];
     
     // Save to localStorage
     localStorage.setItem('cart', JSON.stringify(newCart));
     
     // Update cart count in header
     window.dispatchEvent(new CustomEvent('cartUpdated', { detail: newCart.length }));
+    
+    // Show success notification
+    setNotification({
+      show: true,
+      message: 'Équipement ajouté au panier avec succès',
+      type: 'success'
+    });
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: '' });
+    }, 3000);
   };
 
   const handleViewDetails = (item) => {
@@ -193,6 +207,16 @@ function RentEquip() {
   return (
     <>
       <Header />
+      {notification.show && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className={`p-4 rounded-lg shadow-lg flex items-center ${
+            notification.type === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+          }`}>
+            <AlertCircle className="mr-2" size={20} />
+            <span>{notification.message}</span>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col md:flex-row">
         <FiltringSidebar onFilterChange={handleFilterChange} />
         

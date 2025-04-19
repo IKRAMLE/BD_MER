@@ -27,9 +27,9 @@ const Requests = () => {
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState("table"); // "table" or "card"
-  const [sortBy, setSortBy] = useState("date"); // "date", "name", "price"
-  const [sortOrder, setSortOrder] = useState("desc"); // "asc" or "desc"
+  const [viewMode, setViewMode] = useState("table"); 
+  const [sortBy, setSortBy] = useState("date"); 
+  const [sortOrder, setSortOrder] = useState("desc"); 
   const [expandedFilters, setExpandedFilters] = useState(false);
 
   useEffect(() => {
@@ -91,8 +91,8 @@ const Requests = () => {
               ? `${personalInfo.firstName} ${personalInfo.lastName}`
               : 'Utilisateur',
             status: order.status || 'pending',
-            startDate: order.startDate || new Date().toISOString(),
-            endDate: order.endDate || new Date().toISOString(),
+            startDate: firstItem?.startDate || new Date().toISOString(),
+            endDate: firstItem?.endDate || new Date().toISOString(),
             rentalPeriod: firstItem?.rentalPeriod || 'day',
             totalPrice: order.totalAmount || 0,
             message: order.message || "Aucun message",
@@ -283,6 +283,15 @@ const Requests = () => {
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('fr-FR', options);
+  };
+
+  // Calculate rental duration in days
+  const calculateRentalDuration = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   // Format price with Moroccan Dirham
@@ -596,8 +605,13 @@ const Requests = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900 flex items-center">
-                              <Calendar className="h-4 w-4 mr-1 text-blue-500" />
-                              {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                              <Calendar size={16} className="mr-1" />
+                              <span>
+                                {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                                <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                                  {calculateRentalDuration(request.startDate, request.endDate)} jours
+                                </span>
+                              </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -682,9 +696,14 @@ const Requests = () => {
                         <User className="h-4 w-4 mr-1 text-blue-500" />
                         {request.requesterName}
                       </div>
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <Calendar className="h-4 w-4 mr-1 text-blue-500" />
-                        {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Calendar size={16} className="mr-1" />
+                        <span>
+                          {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                          <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            {calculateRentalDuration(request.startDate, request.endDate)} jours
+                          </span>
+                        </span>
                       </div>
                       <div className="flex items-center text-sm font-medium text-gray-900">
                         {formatPrice(request.totalPrice)}
@@ -783,7 +802,18 @@ const Requests = () => {
                   </div>
                   <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
                     <p className="text-xs text-gray-500">Période de location</p>
-                    <p className="text-sm font-medium">{formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}</p>
+                    <div className="flex items-center mb-2">
+                      <Calendar size={16} className="mr-2 text-gray-500" />
+                      <div>
+                      
+                        <p className="text-sm font-medium">
+                          {formatDate(selectedRequest.startDate)} - {formatDate(selectedRequest.endDate)}
+                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            {calculateRentalDuration(selectedRequest.startDate, selectedRequest.endDate)} jours
+                          </span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg shadow-sm">
                     <p className="text-xs text-gray-500">Date de la demande</p>

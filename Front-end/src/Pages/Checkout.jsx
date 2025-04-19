@@ -27,7 +27,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPayment, setSelectedPayment] = useState('');
-  const [rentalPeriods, setRentalPeriods] = useState({});
+  const [rentalDates, setRentalDates] = useState({});
   const [customPeriods, setCustomPeriods] = useState({});
   const [periodTypes, setPeriodTypes] = useState({});
   const [showOwnerContact, setShowOwnerContact] = useState(false);
@@ -59,36 +59,36 @@ const Checkout = () => {
   const loadCartItems = async () => {
     try {
       setLoading(true);
-      // Get cart items from localStorage
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
       
-      // Fetch full equipment details for each item
       const itemsWithDetails = await Promise.all(
         cart.map(async (item) => {
           const response = await axiosInstance.get(`/equipment/${item.id}`);
           return {
             ...response.data.data,
             quantity: item.quantity,
-            days: item.days || 1, // Default to 1 if not set
-            rentalPeriod: response.data.data.rentalPeriod || 'day' // Get rental period from database
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]
           };
         })
       );
 
       setCartItems(itemsWithDetails);
       
-      // Initialize rental periods and period types
-      const periods = {};
-      const periodTypes = {};
+      // Initialize rental dates
+      const dates = {};
       itemsWithDetails.forEach(item => {
-        periods[item._id] = item.days;
-        periodTypes[item._id] = item.rentalPeriod;
+        dates[item._id] = {
+          startDate: item.startDate,
+          endDate: item.endDate
+        };
       });
-      setRentalPeriods(periods);
-      setPeriodTypes(periodTypes);
+      setRentalDates(dates);
       
-      // Calculate total
-      calculateTotal(itemsWithDetails, periods);
+      // Calculate total after setting the dates
+      setTimeout(() => {
+        calculateTotal(itemsWithDetails, dates);
+      }, 0);
     } catch (error) {
       console.error('Error loading cart items:', error);
       setError('Erreur lors du chargement du panier');
@@ -97,23 +97,33 @@ const Checkout = () => {
     }
   };
 
-  const calculateDiscount = (days) => {
-    if (days >= 30) {
-      return days >= 60 ? 0.10 : 0.05; 
-    }
-    return 0;
+  const calculateMonths = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+    return diffMonths;
   };
 
   const calculateItemTotal = (item) => {
-    const days = rentalPeriods[item._id];
-    const periodType = periodTypes[item._id] || item.rentalPeriod || 'day';
-    const basePrice = item.price * item.quantity;
-    
-    if (periodType === 'month') {
-      return basePrice * Math.ceil(days / 30); 
-    } else {
-      return basePrice * days; 
+    if (!rentalDates[item._id]) {
+      // Initialize dates if they don't exist
+      const today = new Date().toISOString().split('T')[0];
+      const nextMonth = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+      setRentalDates(prev => ({
+        ...prev,
+        [item._id]: {
+          startDate: today,
+          endDate: nextMonth
+        }
+      }));
+      return item.price * item.quantity; // Return price for one month initially
     }
+    
+    const dates = rentalDates[item._id];
+    const months = calculateMonths(dates.startDate, dates.endDate);
+    const basePrice = item.price * item.quantity;
+    return basePrice * months;
   };
 
   const calculateDeposit = (item) => {
@@ -126,9 +136,23 @@ const Checkout = () => {
     return periodType === 'month' ? 'mois' : 'jour';
   };
 
+  const handleDateChange = (itemId, dateType, value) => {
+    setRentalDates(prev => {
+      const updated = {
+        ...prev,
+        [itemId]: {
+          ...prev[itemId],
+          [dateType]: value
+        }
+      };
+      calculateTotal(cartItems, updated);
+      return updated;
+    });
+  };
+
   const handlePeriodChange = (itemId, days) => {
-    setRentalPeriods(prev => {
-      const updated = { ...prev, [itemId]: days };
+    setRentalDates(prev => {
+      const updated = { ...prev, [itemId]: { ...prev[itemId], endDate: prev[itemId].startDate } };
       calculateTotal(cartItems, updated);
       return updated;
     });
@@ -170,10 +194,14 @@ const Checkout = () => {
     return '';
   };
 
-  const calculateTotal = (items = cartItems, periods = rentalPeriods) => {
+  const calculateTotal = (items = cartItems, dates = rentalDates) => {
+    if (!items.length) return;
+    
     const sum = items.reduce((acc, item) => {
-      return acc + calculateItemTotal(item);
+      const itemTotal = calculateItemTotal(item);
+      return acc + (itemTotal || 0);
     }, 0);
+    
     setTotal(sum);
     setDeposit(sum * 0.7); // 70% deposit
   };
@@ -324,12 +352,12 @@ const Checkout = () => {
         items: cartItems.map(item => ({
           equipmentId: item._id,
           quantity: item.quantity,
-          rentalDays: rentalPeriods[item._id],
-          price: item.price,
-          rentalPeriod: periodTypes[item._id] || item.rentalPeriod || 'day'
+          rentalDays: calculateMonths(rentalDates[item._id].startDate, rentalDates[item._id].endDate),
+          price: calculateItemTotal(item) + calculateDeposit(item), // Total à payer (prix + dépôt)
+          rentalPeriod: 'month'
         })),
         paymentMethod: selectedPayment,
-        totalAmount: total,
+        totalAmount: total + deposit, // Total à payer pour toute la commande
         deposit: deposit,
         personalInfo,
         message: message || "Aucun message"
@@ -745,9 +773,9 @@ const Checkout = () => {
           {/* Summary Content */}
           <div className="p-6">
             <div className="space-y-6">
-              {cartItems.map(item => (
-                <div key={item._id} className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition-all">
-                  <div className="flex gap-6">
+              {cartItems.map((item) => (
+                <div key={item._id} className="bg-white rounded-lg shadow-sm p-4 mb-4">
+                  <div className="flex items-start gap-6">
                     {/* Equipment Image */}
                     <div className="relative">
                       <img
@@ -768,36 +796,38 @@ const Checkout = () => {
                           <p className="text-sm text-gray-500 mt-1">{item.description}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-500">Prix par {getPeriodText(item)}</p>
+                          <p className="text-sm text-gray-500">Prix par mois</p>
                           <p className="text-lg font-semibold text-blue-600">{item.price} MAD</p>
                         </div>
                       </div>
 
                       {/* Rental Period Selection */}
-                      <div className="bg-white rounded-lg p-4 mb-4 border border-gray-200">
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
                             <Calendar className="h-5 w-5 text-blue-500" />
                             <div className="flex items-center space-x-2">
                               <input
-                                type="number"
-                                min="1"
-                                value={customPeriods[item._id] || 1}
-                                onChange={(e) => handleCustomPeriodChange(item._id, e.target.value)}
-                                className="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                type="date"
+                                name="startDate"
+                                value={rentalDates[item._id].startDate}
+                                onChange={(e) => handleDateChange(item._id, 'startDate', e.target.value)}
+                                min={new Date().toISOString().split('T')[0]}
+                                className="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               />
-                              <select
-                                value={periodTypes[item._id] || item.rentalPeriod || 'day'}
-                                onChange={(e) => handlePeriodTypeChange(item._id, e.target.value)}
-                                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              >
-                                <option value="day">Jours</option>
-                                <option value="month">Mois</option>
-                              </select>
+                              <span className="text-gray-500">à</span>
+                              <input
+                                type="date"
+                                name="endDate"
+                                value={rentalDates[item._id].endDate}
+                                onChange={(e) => handleDateChange(item._id, 'endDate', e.target.value)}
+                                min={rentalDates[item._id].startDate}
+                                className="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-500">Total période</p>
+                            <p className="text-sm text-gray-500">Durée: {calculateMonths(rentalDates[item._id].startDate, rentalDates[item._id].endDate)} mois</p>
                             <p className="text-lg font-semibold text-blue-600">{calculateItemTotal(item)} MAD</p>
                           </div>
                         </div>
@@ -805,12 +835,12 @@ const Checkout = () => {
 
                       {/* Price Breakdown */}
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-lg p-4">
                           <p className="text-sm text-gray-500 mb-1">Dépôt de garantie</p>
                           <p className="text-lg font-semibold text-blue-600">{calculateDeposit(item)} MAD</p>
                           <p className="text-xs text-gray-400 mt-1">70% du prix total</p>
                         </div>
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div className="bg-gray-50 rounded-lg p-4">
                           <p className="text-sm text-gray-500 mb-1">Total à payer</p>
                           <p className="text-lg font-semibold text-blue-600">{calculateItemTotal(item) + calculateDeposit(item)} MAD</p>
                           <p className="text-xs text-gray-400 mt-1">Inclut le dépôt</p>

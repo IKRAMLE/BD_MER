@@ -45,7 +45,6 @@ function RentEquip() {
       const response = await axiosInstance.get('/favorites');
       
       // Extract equipment IDs from the favorites data
-      // The API returns favorites with populated equipment objects
       const favoriteIds = new Set(
         response.data.data
           .filter(fav => fav && fav.equipment && fav.equipment._id)
@@ -68,6 +67,18 @@ function RentEquip() {
     e.stopPropagation();
     if (!item || !item._id) return; // Guard against invalid items
     
+    if (!isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Veuillez vous connecter pour ajouter aux favoris',
+        type: 'warning'
+      });
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      return;
+    }
+    
     try {
       if (favorites.has(item._id)) {
         // Remove from favorites
@@ -88,7 +99,6 @@ function RentEquip() {
       if (error.response && error.response.status === 401) {
         setIsAuthenticated(false);
         localStorage.removeItem('authToken');
-        navigate('/login2');
       } else {
         console.error('Error toggling favorite:', error);
       }
@@ -260,10 +270,6 @@ function RentEquip() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (!isAuthenticated) {
-                            navigate('/login2');
-                            return;
-                          }
                           toggleFavorite(e, item);
                         }}
                         className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"

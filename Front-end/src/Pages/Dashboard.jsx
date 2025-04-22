@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import axiosInstance from "../utils/axiosConfig";
 import { Compass, TrendingUp, User, Heart, Package, Settings, MessageSquare, ClipboardList } from "lucide-react";
-import logo from "/caduceus.png";
 import DashboardHeader from "../Components/DashboardHeader";
 import Sidebar from "../Components/Sidebar";
 import StatsCards from "../Components/StatsCards";

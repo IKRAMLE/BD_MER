@@ -50,13 +50,13 @@ function FilteringSidebar({ onFilterChange }) {
   };
 
   return (
-    <div className="p-6 rounded-lg shadow bg-[#6eb1f4] mt-30 ml-5 w-80 h-145">
-      <h4 className="text-lg font-medium mb-4 text-[#2c3e50]">Filtres</h4>
+    <div className="p-6 rounded-lg shadow bg-gradient-to-b from-[#084b88] to-[#082a4d] mt-30 ml-5 w-80 h-145">
+      <h4 className="text-lg font-medium mb-4 text-[#ffffff]">Filtres</h4>
 
       <form onSubmit={(e) => e.preventDefault()}>
         {/* Category Filter */}
         <div className="mb-4">
-          <label htmlFor="category" className="block mb-2 text-sm text-[#7d8a96]">
+          <label htmlFor="category" className="block mb-2 text-sm text-[#ffffff]">
             Catégorie
           </label>
           <select
@@ -74,7 +74,7 @@ function FilteringSidebar({ onFilterChange }) {
 
         {/* Price Range Filter */}
         <div className="mb-4">
-          <label htmlFor="priceRange" className="block mb-2 text-sm text-[#7d8a96]">
+          <label htmlFor="priceRange" className="block mb-2 text-sm text-[#ffffff]">
             Prix Maximum
           </label>
           <input
@@ -86,7 +86,7 @@ function FilteringSidebar({ onFilterChange }) {
             onChange={(e) => handlePriceChange(e.target.value)}
             className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[#e5e3e0]"
           />
-          <div className="flex justify-between text-xs mt-1 text-[#95a5a6]">
+          <div className="flex justify-between text-xs mt-1 text-[#ffffff]">
             <span>0 DH</span>
             <span>{priceRange.max} DH</span>
           </div>
@@ -94,7 +94,7 @@ function FilteringSidebar({ onFilterChange }) {
 
         {/* Availability Filter */}
         <div className="mb-4">
-          <label htmlFor="availability" className="block mb-2 text-sm text-[#7d8a96]">
+          <label htmlFor="availability" className="block mb-2 text-sm text-[#ffffff]">
             Disponibilité
           </label>
           <select
@@ -111,7 +111,7 @@ function FilteringSidebar({ onFilterChange }) {
 
         {/* Condition Filter */}
         <div className="mb-4">
-          <label htmlFor="condition" className="block mb-2 text-sm text-[#7d8a96]">
+          <label htmlFor="condition" className="block mb-2 text-sm text-[#ffffff]">
             État
           </label>
           <select
@@ -130,7 +130,7 @@ function FilteringSidebar({ onFilterChange }) {
 
         {/* Sort By Filter */}
         <div className="mb-4">
-          <label htmlFor="sortBy" className="block mb-2 text-sm text-[#7d8a96]">
+          <label htmlFor="sortBy" className="block mb-2 text-sm text-[#ffffff]">
             Trier Par
           </label>
           <select
@@ -151,7 +151,7 @@ function FilteringSidebar({ onFilterChange }) {
         <button
           type="button"
           onClick={handleFilterChange}
-          className="w-full py-2 px-4 rounded transition duration-150 ease-in-out text-white bg-[#3498db] hover:bg-[#2980b9]"
+          className="w-full py-2 px-4 mt-4 rounded transition duration-150 ease-in-out text-black bg-[#ffffff] hover:bg-[#adb4b8]"
         >
           Appliquer les Filtres
         </button>
